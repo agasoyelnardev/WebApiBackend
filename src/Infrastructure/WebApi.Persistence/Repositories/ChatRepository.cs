@@ -19,12 +19,27 @@ public class ChatRepository:IChatRepository
         _context = context;
     }
     
+    public async Task<StreamRoom?> GetRoomByIdAsync(Guid roomId)
+        => await _context.StreamRooms
+            .FirstOrDefaultAsync(r => r.Id == roomId);
+    
     public async Task<List<ChatMessage>> GetMessagesByRoomIdAsync(Guid roomId)
-    {
-        return await _context.ChatMessages
+        => await _context.ChatMessages
             .Where(m => m.StreamRoomId == roomId)
+            .OrderBy(m => m.CreatedAt) 
             .ToListAsync();
+    
+    public Task DeleteRoomAsync(StreamRoom room)
+    {
+        _context.StreamRooms.Remove(room);
+        return Task.CompletedTask;
     }
+
+    public async Task<List<StreamRoom>> GetActiveRoomsAsync()
+        => await _context.StreamRooms
+            .Where(r => r.IsLive)
+            .OrderByDescending(r => r.ViewerCount)
+            .ToListAsync();
     
     public async Task AddMessageAsync(ChatMessage message)
     {

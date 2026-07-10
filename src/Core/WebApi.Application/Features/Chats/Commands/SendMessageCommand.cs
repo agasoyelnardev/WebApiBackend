@@ -1,44 +1,60 @@
 using MediatR;
-using Microsoft.AspNetCore.SignalR; 
-using WebApi.Application.Hubs;      
+using Microsoft.AspNetCore.SignalR;
+using WebApi.Application.Hubs;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Chats.Commands;
 
-public record SendMessageCommand(Guid StreamRoomId, string UserId, string Username, string MessageText) : IRequest<bool>;
-
-public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, bool>
+public record SendMessageCommand(Guid RoomId, string MessageText) : IRequest<Guid>
 {
-    private readonly IChatRepository _chatRepository;
-    private readonly IHubContext<ChatHub> _hubContext; 
+    public string UserId { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string UserAvatarUrl { get; set; } = string.Empty;
+}
 
-    public SendMessageCommandHandler(IChatRepository chatRepository, IHubContext<ChatHub> hubContext)
+public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Guid>
+{
+    private readonly IChatRepository _repository;
+    private readonly IHubContext<ChatHub> _hubContext;
+
+    public SendMessageCommandHandler(IChatRepository repository, IHubContext<ChatHub> hubContext)
     {
-        _chatRepository = chatRepository;
+        _repository = repository;
         _hubContext = hubContext;
     }
 
-    public async Task<bool> Handle(SendMessageCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
+        var room = await _repository.GetRoomByIdAsync(request.RoomId);
+        if (room is null)
+            throw new KeyNotFoundException("Otaq tapılmadı");
+
         var message = new ChatMessage
         {
-            StreamRoomId = request.StreamRoomId,
+            Id = Guid.NewGuid(),
+            StreamRoomId = request.RoomId,
             UserId = request.UserId,
             Username = request.Username,
-            MessageText = request.MessageText
+            UserAvatarUrl = request.UserAvatarUrl,
+            MessageText = request.MessageText,
+            IsSystemMessage = false
         };
 
-        await _chatRepository.AddMessageAsync(message);
-        var isSaved = await _chatRepository.SaveChangesAsync();
+        await _repository.AddMessageAsync(message);
+        await _repository.SaveChangesAsync();
 
-        if (isSaved)
-        {
-            // Otaqdakı hər kəsə anlıq ötürürük
-            await _hubContext.Clients.Group(request.StreamRoomId.ToString())
-                .SendAsync("ReceiveMessage", request.Username, request.MessageText, DateTime.UtcNow, cancellationToken);
-        }
+        // ✅ Real-time yayım — DB-yə yazıldıqdan SONRA
+        await _hubContext.Clients.Group(request.RoomId.ToString())
+            .SendAsync("ReceiveMessage", new
+            {
+                message.Id,
+                message.UserId,
+                message.Username,
+                message.UserAvatarUrl,
+                message.MessageText
+            }, cancellationToken);
 
-        return isSaved;
+        return message.Id;
     }
 }

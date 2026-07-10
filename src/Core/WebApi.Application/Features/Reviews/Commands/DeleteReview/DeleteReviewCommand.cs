@@ -2,7 +2,7 @@ using MediatR;
 
 namespace WebApi.Application.Features.Reviews.Commands.DeleteReview;
 
-public class DeleteReviewCommand : IRequest
+public class DeleteReviewCommand : IRequest<Unit>
 {
     public Guid Id { get; set; }
 

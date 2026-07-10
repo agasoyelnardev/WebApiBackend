@@ -10,9 +10,8 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
     {
         builder.HasKey(r => r.Id);
 
-        builder.Property(r => r.Author)
-            .IsRequired()
-            .HasMaxLength(100);
+        builder.Property(r => r.UserId)
+            .IsRequired();
 
         builder.Property(r => r.Content)
             .IsRequired()
@@ -26,5 +25,10 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .WithMany(m => m.Reviews)
             .HasForeignKey(r => r.MovieId)
             .OnDelete(DeleteBehavior.Cascade); // Əgər film silinərsə, ona yazılan rəylər də avtomatik silinsin
+        
+        builder.HasOne(r => r.User)
+            .WithMany(u => u.Reviews)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

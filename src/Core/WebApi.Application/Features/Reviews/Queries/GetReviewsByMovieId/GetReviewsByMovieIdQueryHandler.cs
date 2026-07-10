@@ -22,7 +22,8 @@ public class GetReviewsByMovieIdQueryHandler
             .Where(r => r.MovieId == request.MovieId && !r.IsDeleted)
             .Select(r => new ReviewDto
             {
-                Author = r.Author,
+                Id =  r.Id,
+                Author = r.User.UserName ?? "Unknown",
                 Content = r.Content,
                 Rating = r.Rating
             })

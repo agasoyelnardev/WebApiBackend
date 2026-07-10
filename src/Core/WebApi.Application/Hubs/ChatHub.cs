@@ -1,26 +1,46 @@
+using System.Security.Claims;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using WebApi.Application.Features.Chats.Commands;
 
 namespace WebApi.Application.Hubs;
 
+[Authorize]
 public class ChatHub : Hub
 {
-    // İstifadəçi bir canlı yayım və ya Watch Party otağına daxil olduqda çağırılır
+    private readonly IMediator _mediator;
+
+    public ChatHub(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
     public async Task JoinRoom(string roomId)
     {
-        // İstifadəçini həmin otağın xüsusi SignalR qrupuna əlavə edirik
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
     }
 
-    // İstifadəçi otaqdan çıxdıqda və ya səhifəni bağlayanda qrupdan çıxarılır
     public async Task LeaveRoom(string roomId)
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
     }
 
-    // Yeni mesaj göndərildikdə yalnız həmin otaqdakı insanlara anlıq ötürülür
-    public async Task SendMessage(string roomId, string username, string message)
+    public async Task SendMessage(string roomId, string messageText)
     {
-        // "ReceiveMessage" metodu ilə otaqdakı hər kəsin ekranına mesajı anında göndəririk
-        await Clients.Group(roomId).SendAsync("ReceiveMessage", username, message, DateTime.UtcNow);
+        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var username = Context.User?.FindFirst(ClaimTypes.Name)?.Value ?? "Anonim";
+
+        if (userId is null)
+            throw new HubException("İstifadəçi doğrulanmadı");
+
+        var command = new SendMessageCommand(Guid.Parse(roomId), messageText)
+        {
+            UserId = userId,
+            Username = username
+        };
+
+        // Handler həm DB-yə yazır, həm də ReceiveMessage ilə broadcast edir
+        await _mediator.Send(command);
     }
 }

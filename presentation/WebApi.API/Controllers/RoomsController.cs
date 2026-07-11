@@ -31,9 +31,6 @@ public class RoomsController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand command)
     {
-        if (_currentUserService.UserId is null)
-            return Unauthorized();
-
         command.CreatedByUserId = _currentUserService.UserId;
 
         var roomId = await _mediator.Send(command);
@@ -43,8 +40,6 @@ public class RoomsController : ControllerBase
     [HttpDelete("{roomId}")]
     public async Task<IActionResult> DeleteRoom(Guid roomId)
     {
-        if (_currentUserService.UserId is null)
-            return Unauthorized();
 
         try
         {
@@ -68,8 +63,6 @@ public class RoomsController : ControllerBase
     [HttpPut("{roomId}/close")]
     public async Task<IActionResult> CloseRoom(Guid roomId)
     {
-        if (_currentUserService.UserId is null)
-            return Unauthorized();
 
         try
         {

@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Features.Chats.Queries;
@@ -19,6 +20,7 @@ public class ChatsController : ControllerBase
         _currentUserService = currentUserService;
     }
 
+    [Authorize]
     [HttpPost("send")]
     public async Task<IActionResult> SendMessage([FromBody] SendMessageCommand command)
     {
@@ -37,6 +39,14 @@ public class ChatsController : ControllerBase
     {
         var messages = await _mediator.Send(new GetRoomMessagesQuery(roomId));
         return Ok(messages);
+    }
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteChatMessageCommand(id));
+
+        return NoContent();
     }
 
 }

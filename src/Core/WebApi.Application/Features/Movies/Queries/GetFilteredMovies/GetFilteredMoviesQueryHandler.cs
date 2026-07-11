@@ -31,7 +31,6 @@ public class GetFilteredMoviesQueryHandler : IRequestHandler<GetFilteredMoviesQu
         // YENİ JANR FİLTRİ: Siyahının daxilində axtarış edir
         if (!string.IsNullOrWhiteSpace(request.Genre) && request.Genre != "Bütün Janrlar")
         {
-            // Genres siyahısında frontend-dən gələn janr adına bərabər olan element varmı deyə yoxlayır
             query = query.Where(m => m.Genres.Contains(request.Genre));
         }
 

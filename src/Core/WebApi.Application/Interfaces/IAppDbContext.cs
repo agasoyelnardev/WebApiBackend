@@ -7,5 +7,6 @@ public interface IAppDbContext
 {
     DbSet<Movie> Movies { get; }
     DbSet<Review> Reviews { get; }
+    DbSet<ChatMessage> ChatMessages { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

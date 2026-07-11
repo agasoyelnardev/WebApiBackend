@@ -35,6 +35,9 @@ public class CreateMovieCommandHandler
             Cast = request.Cast
         };
 
+        if (string.IsNullOrWhiteSpace(request.Title))
+            throw new Exception("Film adı boş ola bilməz.");
+        
         await _context.Movies.AddAsync(movie, cancellationToken);
 
         await _context.SaveChangesAsync(cancellationToken);

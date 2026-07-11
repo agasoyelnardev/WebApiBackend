@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Movies.Commands.CreateMovie;
 using WebApi.Application.Features.Movies.Commands.DeleteMovie;
@@ -23,7 +24,6 @@ public class MoviesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Movie>>> GetFiltered([FromQuery] GetFilteredMoviesQuery query)
     {
-        // MediatR sorğunu qəbul edir və avtomatik sizin GetFilteredMoviesQueryHandler-ə yönləndirir
         var movies = await _mediator.Send(query);
         return Ok(movies);
     }
@@ -41,6 +41,7 @@ public class MoviesController : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create(CreateMovieCommand command)
     {
         var movieId = await _mediator.Send(command);
@@ -49,6 +50,7 @@ public class MoviesController : ControllerBase
     }
     
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(
         Guid id,
         UpdateMovieCommand command)
@@ -64,6 +66,7 @@ public class MoviesController : ControllerBase
     }
     
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _mediator.Send(

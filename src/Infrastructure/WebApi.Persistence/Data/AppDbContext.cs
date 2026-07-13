@@ -18,6 +18,9 @@ namespace WebApi.Persistence.Data;
         public DbSet<Review> Reviews { get; set; }
         public DbSet<MovieCollection> MovieCollections { get; set; }
         public DbSet<Movie> Movies { get; set; }
+        
+        public DbSet<UserFollow> UserFollows { get; set; }
+        public DbSet<Friendship> Friendships { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

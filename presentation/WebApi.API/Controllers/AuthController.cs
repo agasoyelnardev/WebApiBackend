@@ -33,5 +33,15 @@ public class AuthController : ControllerBase
         return Ok(token);
     }
     
+    [Authorize]
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        return Ok(new
+        {
+            Message = "Uğurla çıxış edildi."
+        });
+    }
+    
     
 }

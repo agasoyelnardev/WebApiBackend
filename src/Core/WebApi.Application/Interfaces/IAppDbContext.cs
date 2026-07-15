@@ -10,5 +10,6 @@ public interface IAppDbContext
     DbSet<ChatMessage> ChatMessages { get; }
     DbSet<UserFollow> UserFollows { get; }
     DbSet<Friendship> Friendships { get; }
+    DbSet<AppUser> Users { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

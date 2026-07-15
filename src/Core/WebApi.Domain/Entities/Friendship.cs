@@ -1,5 +1,6 @@
 using WebApi.Domain.Entities;
 using WebApi.Domain.Entities.Base;
+using WebApi.Domain.Enum;
 
 public class Friendship:BaseEntity
 {

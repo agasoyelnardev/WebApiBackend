@@ -1,10 +1,16 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Application.Features.Social.Commands.AcceptFriendRequest;
+using WebApi.Application.Features.Social.Commands.DeclineFriendRequest;
 using WebApi.Application.Features.Social.Commands.FollowUser;
+using WebApi.Application.Features.Social.Commands.RemoveFriend;
+using WebApi.Application.Features.Social.Commands.SendFriendRequest;
 using WebApi.Application.Features.Social.Commands.UnfollowUser;
 using WebApi.Application.Features.Social.Queries.GetFollowers;
 using WebApi.Application.Features.Social.Queries.GetFollowing;
+using WebApi.Application.Features.Social.Queries.GetPendingFriendRequests;
+using WebApi.Application.Features.Social.Query.GetFriends;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
@@ -31,6 +37,9 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
+        if (_currentUserService.UserId == userId)
+            return BadRequest("Özünüzü izləyə bilməzsiniz.");
+
         var result = await _mediator.Send(
             new FollowUserCommand(userId)
             {
@@ -40,7 +49,7 @@ public class SocialController : ControllerBase
         if (!result)
             return BadRequest("İzləmə əməliyyatı uğursuz oldu");
 
-        return Ok("İstifadəçi izlənildi");
+        return Ok(new { Message = "İstifadəçi izlənildi" });
     }
 
     [HttpDelete("follow/{userId}")]
@@ -58,16 +67,14 @@ public class SocialController : ControllerBase
         if (!result)
             return BadRequest("İzləmədən çıxma əməliyyatı uğursuz oldu");
 
-        return Ok("İzləmədədən çıxarıldı");
+        return Ok(new { Message = "İzləmədən çıxarıldı" });
     }
 
     [AllowAnonymous]
     [HttpGet("followers/{userId}")]
     public async Task<IActionResult> GetFollowers(string userId)
     {
-        var followers = await _mediator.Send(
-            new GetFollowersQuery(userId));
-
+        var followers = await _mediator.Send(new GetFollowersQuery(userId));
         return Ok(followers);
     }
 
@@ -75,9 +82,100 @@ public class SocialController : ControllerBase
     [HttpGet("following/{userId}")]
     public async Task<IActionResult> GetFollowing(string userId)
     {
-        var following = await _mediator.Send(
-            new GetFollowingQuery(userId));
-
+        var following = await _mediator.Send(new GetFollowingQuery(userId));
         return Ok(following);
+    }
+    
+    [HttpGet("friends/{userId}")]
+    public async Task<IActionResult> GetFriends(string userId)
+    {
+        var friends = await _mediator.Send(new GetFriendsQuery(userId));
+        return Ok(friends);
+    }
+    
+    [HttpGet("friend-requests")]
+    public async Task<IActionResult> GetPendingRequests()
+    {
+        if (_currentUserService.UserId is null)
+            return Unauthorized();
+
+        // Təhlükəsizlik: İstifadəçi yalnız özünə gələn sorğuları görə bilər, userId parametrə ehtiyac yoxdur.
+        var requests = await _mediator.Send(new GetPendingFriendRequestsQuery(_currentUserService.UserId));
+        return Ok(requests);
+    }
+    
+    [HttpPost("friend-request/{userId}")]
+    public async Task<IActionResult> SendFriendRequest(string userId)
+    {
+        if (_currentUserService.UserId is null)
+            return Unauthorized();
+
+        if (_currentUserService.UserId == userId)
+            return BadRequest("Özünüzə dostluq sorğusu göndərə bilməzsiniz.");
+
+        var result = await _mediator.Send(
+            new SendFriendRequestCommand(userId)
+            {
+                SenderId = _currentUserService.UserId
+            });
+
+        if (!result)
+            return BadRequest("Sorğu göndərilə bilmədi və ya artıq mövcuddur");
+
+        return Ok(new { Message = "Dostluq sorğusu göndərildi" });
+    }
+    
+    [HttpPut("friend-request/{friendshipId}/accept")]
+    public async Task<IActionResult> AcceptFriendRequest(Guid friendshipId)
+    {
+        if (_currentUserService.UserId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(
+            new AcceptFriendRequestCommand(friendshipId)
+            {
+                UserId = _currentUserService.UserId
+            });
+
+        if (!result)
+            return BadRequest("Sorğu qəbul edilə bilmədi");
+
+        return Ok(new { Message = "Dostluq sorğusu qəbul edildi" });
+    }
+    
+    [HttpPut("friend-request/{friendshipId}/decline")]
+    public async Task<IActionResult> DeclineFriendRequest(Guid friendshipId)
+    {
+        if (_currentUserService.UserId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(
+            new DeclineFriendRequestCommand(friendshipId)
+            {
+                UserId = _currentUserService.UserId
+            });
+
+        if (!result)
+            return BadRequest("Sorğu rədd edilə bilmədi");
+
+        return Ok(new { Message = "Dostluq sorğusu rədd edildi" });
+    }
+    
+    [HttpDelete("friend/{userId}")]
+    public async Task<IActionResult> RemoveFriend(string userId)
+    {
+        if (_currentUserService.UserId is null)
+            return Unauthorized();
+
+        var result = await _mediator.Send(
+            new RemoveFriendCommand(userId)
+            {
+                CurrentUserId = _currentUserService.UserId
+            });
+
+        if (!result)
+            return BadRequest("Dostluq silinə bilmədi");
+
+        return Ok(new { Message = "Dostluq silindi" });
     }
 }

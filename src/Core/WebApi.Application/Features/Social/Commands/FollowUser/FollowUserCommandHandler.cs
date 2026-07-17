@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
@@ -20,7 +21,13 @@ public class FollowUserCommandHandler
         CancellationToken cancellationToken)
     {
         if (request.FollowerUserId == request.FollowingUserId)
-            return false;
+            throw new BadRequestException("Özünüzü izləyə bilməzsiniz.");
+
+        var targetUserExists = await _context.Users.AnyAsync(
+            u => u.Id == request.FollowingUserId, cancellationToken);
+
+        if (!targetUserExists)
+            throw new NotFoundException("İstifadəçi tapılmadı.");
 
         var exists = await _context.UserFollows.AnyAsync(
             x => x.FollowerId == request.FollowerUserId
@@ -28,7 +35,7 @@ public class FollowUserCommandHandler
             cancellationToken);
 
         if (exists)
-            return false;
+            throw new ConflictException("Siz artıq bu istifadəçini izləyirsiniz.");
 
         var follow = new UserFollow
         {

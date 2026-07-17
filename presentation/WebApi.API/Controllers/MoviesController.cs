@@ -22,7 +22,7 @@ public class MoviesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Movie>>> GetFiltered([FromQuery] GetFilteredMoviesQuery query)
+    public async Task<ActionResult<List<MovieDto>>> GetFiltered([FromQuery] GetFilteredMoviesQuery query)
     {
         var movies = await _mediator.Send(query);
         return Ok(movies);
@@ -31,8 +31,7 @@ public class MoviesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var movie = await _mediator.Send(
-            new GetMovieByIdQuery(id));
+        var movie = await _mediator.Send(new GetMovieByIdQuery(id));
 
         if (movie is null)
             return NotFound();
@@ -51,17 +50,10 @@ public class MoviesController : ControllerBase
     
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(
-        Guid id,
-        UpdateMovieCommand command)
+    public async Task<IActionResult> Update(Guid id, UpdateMovieCommand command)
     {
         command.Id = id;
-
-        var result = await _mediator.Send(command);
-
-        if (!result)
-            return NotFound();
-
+        await _mediator.Send(command);
         return NoContent();
     }
     
@@ -69,12 +61,7 @@ public class MoviesController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var result = await _mediator.Send(
-            new DeleteMovieCommand(id));
-
-        if (!result)
-            return NotFound();
-
+        await _mediator.Send(new DeleteMovieCommand(id));
         return NoContent();
     }
 }

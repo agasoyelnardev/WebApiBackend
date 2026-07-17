@@ -1,11 +1,10 @@
 using MediatR;
-using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
 
-public class GetMovieByIdQuery : IRequest<Movie?>
+public class GetMovieByIdQuery : IRequest<MovieDto?>
 {
-    public Guid Id { get; set; } 
+    public Guid Id { get; set; }
 
     public GetMovieByIdQuery(Guid id)
     {

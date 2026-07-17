@@ -1,4 +1,5 @@
 using MediatR;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
@@ -17,6 +18,19 @@ public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, Guid>
 
     public async Task<Guid> Handle(CreateRoomCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(request.CreatedByUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
+        if (string.IsNullOrWhiteSpace(request.RoomName))
+            throw new BadRequestException("Otaq adı boş ola bilməz.");
+
+        if (request.RoomName.Length > 100)
+            throw new BadRequestException("Otaq adı maksimum 100 simvol ola bilər.");
+
+        var hasActiveRoom = await _repository.HasActiveRoomByUserAsync(request.CreatedByUserId);
+        if (hasActiveRoom)
+            throw new BadRequestException("Artıq aktiv otağınız var. Yeni otaq yaratmaq üçün əvvəlcə mövcud otağınızı silin.");
+
         var room = new StreamRoom
         {
             Id = Guid.NewGuid(),

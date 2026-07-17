@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Enum;
 
@@ -19,6 +20,9 @@ public class RemoveFriendCommandHandler
         RemoveFriendCommand request,
         CancellationToken cancellationToken)
     {
+        if (request.CurrentUserId == request.FriendUserId)
+            throw new BadRequestException("Özünüzü dostluqdan silə bilməzsiniz.");
+
         var friendship = await _context.Friendships
             .FirstOrDefaultAsync(
                 x =>
@@ -33,14 +37,11 @@ public class RemoveFriendCommandHandler
                     ),
                 cancellationToken);
 
-        if (request.CurrentUserId == request.FriendUserId)
-            return false;
-        
         if (friendship is null)
-            return false;
+            throw new NotFoundException("Dostluq tapılmadı.");
 
         if (friendship.Status != FriendshipStatus.Accepted)
-            return false;
+            throw new ConflictException("Bu istifadəçi ilə hələ dost deyilsiniz.");
 
         _context.Friendships.Remove(friendship);
 

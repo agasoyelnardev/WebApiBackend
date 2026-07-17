@@ -21,6 +21,8 @@ namespace WebApi.Persistence.Data;
         
         public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -34,18 +34,19 @@ public class ChatsController : ControllerBase
         return Ok(new { Message = "Mesaj göndərildi", MessageId = messageId });
     }
 
+    [Authorize]
     [HttpGet("room/{roomId}")]
     public async Task<IActionResult> GetRoomMessage(Guid roomId)
     {
         var messages = await _mediator.Send(new GetRoomMessagesQuery(roomId));
         return Ok(messages);
     }
+    
     [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _mediator.Send(new DeleteChatMessageCommand(id));
-
         return NoContent();
     }
 

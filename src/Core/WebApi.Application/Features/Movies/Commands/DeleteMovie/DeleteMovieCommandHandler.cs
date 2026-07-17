@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.Movies.Commands.DeleteMovie;
@@ -24,7 +25,7 @@ public class DeleteMovieCommandHandler
                 cancellationToken);
 
         if (movie is null)
-            return false;
+            throw new NotFoundException("Film tapılmadı.");
 
         movie.IsDeleted = true;
         movie.UpdatedAt = DateTime.UtcNow;

@@ -465,6 +465,42 @@ namespace WebApi.Persistence.Migrations
                     b.ToTable("MovieCollections");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
@@ -660,6 +696,17 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("StreamRoom");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.Review", b =>
                 {
                     b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
@@ -703,6 +750,8 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("Following");
 
                     b.Navigation("ReceivedFriendRequests");
+
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("Reviews");
 

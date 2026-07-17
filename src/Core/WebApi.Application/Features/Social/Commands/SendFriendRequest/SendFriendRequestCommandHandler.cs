@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Enum;
 
@@ -20,7 +21,13 @@ public class SendFriendRequestCommandHandler
         CancellationToken cancellationToken)
     {
         if (request.SenderId == request.ReceiverId)
-            return false;
+            throw new BadRequestException("Özünüzə dostluq sorğusu göndərə bilməzsiniz.");
+
+        var receiverExists = await _context.Users.AnyAsync(
+            u => u.Id == request.ReceiverId, cancellationToken);
+
+        if (!receiverExists)
+            throw new NotFoundException("İstifadəçi tapılmadı.");
 
         var exists = await _context.Friendships.AnyAsync(
             x =>
@@ -31,8 +38,20 @@ public class SendFriendRequestCommandHandler
                  x.ReceiverId == request.SenderId),
             cancellationToken);
 
-        if (exists)
-            return false;
+        var existingFriendship = await _context.Friendships.FirstOrDefaultAsync(
+            x =>
+                (x.SenderId == request.SenderId && x.ReceiverId == request.ReceiverId)
+                ||
+                (x.SenderId == request.ReceiverId && x.ReceiverId == request.SenderId),
+            cancellationToken);
+
+        if (existingFriendship is not null)
+        {
+            if (existingFriendship.Status == FriendshipStatus.Accepted)
+                throw new ConflictException("Siz artıq dostsunuz.");
+
+            throw new ConflictException("Gözləyən dostluq sorğusu artıq mövcuddur.");
+        }
 
         var friendship = new Friendship
         {

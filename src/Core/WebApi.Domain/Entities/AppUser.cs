@@ -12,6 +12,8 @@ public class AppUser : IdentityUser
 
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    
     //Follow
     public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();
     public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();

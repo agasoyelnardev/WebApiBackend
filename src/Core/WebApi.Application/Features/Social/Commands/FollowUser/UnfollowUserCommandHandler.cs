@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.Social.Commands.UnfollowUser;
@@ -25,7 +26,7 @@ public class UnfollowUserCommandHandler
                 cancellationToken);
 
         if (follow is null)
-            return false;
+            throw new NotFoundException("İzləmə qeydi tapılmadı.");
 
         _context.UserFollows.Remove(follow);
 

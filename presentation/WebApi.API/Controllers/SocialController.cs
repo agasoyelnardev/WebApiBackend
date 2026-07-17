@@ -37,17 +37,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        if (_currentUserService.UserId == userId)
-            return BadRequest("Özünüzü izləyə bilməzsiniz.");
-
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new FollowUserCommand(userId)
             {
                 FollowerUserId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("İzləmə əməliyyatı uğursuz oldu");
 
         return Ok(new { Message = "İstifadəçi izlənildi" });
     }
@@ -58,14 +52,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new UnfollowUserCommand(userId)
             {
                 FollowerUserId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("İzləmədən çıxma əməliyyatı uğursuz oldu");
 
         return Ok(new { Message = "İzləmədən çıxarıldı" });
     }
@@ -110,17 +101,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        if (_currentUserService.UserId == userId)
-            return BadRequest("Özünüzə dostluq sorğusu göndərə bilməzsiniz.");
-
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new SendFriendRequestCommand(userId)
             {
                 SenderId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("Sorğu göndərilə bilmədi və ya artıq mövcuddur");
 
         return Ok(new { Message = "Dostluq sorğusu göndərildi" });
     }
@@ -131,14 +116,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new AcceptFriendRequestCommand(friendshipId)
             {
                 UserId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("Sorğu qəbul edilə bilmədi");
 
         return Ok(new { Message = "Dostluq sorğusu qəbul edildi" });
     }
@@ -149,14 +131,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new DeclineFriendRequestCommand(friendshipId)
             {
                 UserId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("Sorğu rədd edilə bilmədi");
 
         return Ok(new { Message = "Dostluq sorğusu rədd edildi" });
     }
@@ -167,14 +146,11 @@ public class SocialController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        var result = await _mediator.Send(
+        await _mediator.Send(
             new RemoveFriendCommand(userId)
             {
                 CurrentUserId = _currentUserService.UserId
             });
-
-        if (!result)
-            return BadRequest("Dostluq silinə bilmədi");
 
         return Ok(new { Message = "Dostluq silindi" });
     }

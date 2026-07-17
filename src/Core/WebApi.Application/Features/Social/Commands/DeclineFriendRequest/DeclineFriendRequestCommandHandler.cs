@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Enum;
 
@@ -25,13 +26,13 @@ public class DeclineFriendRequestCommandHandler
                 cancellationToken);
 
         if (friendship is null)
-            return false;
+            throw new NotFoundException("Dostluq sorğusu tapılmadı.");
 
         if (friendship.ReceiverId != request.UserId)
-            return false;
+            throw new UnauthorizedAccessException("Bu sorğunu rədd etmək icazəniz yoxdur.");
 
         if (friendship.Status != FriendshipStatus.Pending)
-            return false;
+            throw new ConflictException("Bu sorğu artıq emal olunub.");
 
         friendship.Status = FriendshipStatus.Declined;
         friendship.UpdatedAt = DateTime.UtcNow;

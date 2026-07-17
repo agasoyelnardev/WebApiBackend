@@ -1,4 +1,5 @@
 using MediatR;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
@@ -18,6 +19,18 @@ public class CreateMovieCommandHandler
         CreateMovieCommand request,
         CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.Title))
+            throw new BadRequestException("Film adı boş ola bilməz.");
+
+        if (request.Year < 1888 || request.Year > DateTime.UtcNow.Year + 1)
+            throw new BadRequestException("Film ili düzgün deyil.");
+
+        if (string.IsNullOrWhiteSpace(request.Duration))
+            throw new BadRequestException("Film uzunluğu boş ola bilməz.");
+
+        if (request.Genres is null || !request.Genres.Any())
+            throw new BadRequestException("Ən azı bir janr seçilməlidir.");
+
         var movie = new Movie
         {
             Title = request.Title,
@@ -25,7 +38,7 @@ public class CreateMovieCommandHandler
             Description = request.Description,
             Poster = request.Poster,
             Banner = request.Banner,
-            Rating = request.Rating,
+            Rating = 0,
             Year = request.Year,
             Duration = request.Duration,
             Director = request.Director,
@@ -35,11 +48,7 @@ public class CreateMovieCommandHandler
             Cast = request.Cast
         };
 
-        if (string.IsNullOrWhiteSpace(request.Title))
-            throw new Exception("Film adı boş ola bilməz.");
-        
         await _context.Movies.AddAsync(movie, cancellationToken);
-
         await _context.SaveChangesAsync(cancellationToken);
 
         return movie.Id;

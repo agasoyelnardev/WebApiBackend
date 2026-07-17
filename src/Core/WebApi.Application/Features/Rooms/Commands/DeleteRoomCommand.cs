@@ -1,4 +1,5 @@
 using MediatR;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.Rooms.Commands;
@@ -21,18 +22,18 @@ public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand, Unit>
 
     public async Task<Unit> Handle(DeleteRoomCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(request.RequestedByUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         var room = await _repository.GetRoomByIdAsync(request.RoomId);
+
+        if (room is null)
+            throw new NotFoundException("Otaq tapılmadı");
+
         var isAdmin = _currentUserService.IsInRole("Admin");
 
         if (room.CreatedByUserId != request.RequestedByUserId && !isAdmin)
-        {
-            throw new UnauthorizedAccessException(
-                "Bu otağı silmək icazəniz yoxdur");
-        }
-        
-        if (room is null)
-            throw new KeyNotFoundException("Otaq tapılmadı");
-        
+            throw new UnauthorizedAccessException("Bu otağı silmək icazəniz yoxdur");
 
         await _repository.DeleteRoomAsync(room);
         await _repository.SaveChangesAsync();

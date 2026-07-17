@@ -1382,7 +1382,10 @@
         },
         "runtime": {
           "bin/placeholder/WebApi.Application.dll": {}
-        }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
       },
       "WebApi.Domain/1.0.0": {
         "type": "project",

@@ -1,12 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
 
-public class GetMovieByIdQueryHandler 
-    : IRequestHandler<GetMovieByIdQuery, Movie?>
+public class GetMovieByIdQueryHandler
+    : IRequestHandler<GetMovieByIdQuery, MovieDto?>
 {
     private readonly IAppDbContext _context;
 
@@ -15,16 +14,29 @@ public class GetMovieByIdQueryHandler
         _context = context;
     }
 
-    public async Task<Movie?> Handle(
+    public async Task<MovieDto?> Handle(
         GetMovieByIdQuery request,
         CancellationToken cancellationToken)
     {
         return await _context.Movies
-            .Include(x => x.Reviews)
-            .FirstOrDefaultAsync(
-                x => x.Id == request.Id && !x.IsDeleted,
-                cancellationToken);
-        
-        
+            .Where(x => x.Id == request.Id && !x.IsDeleted)
+            .Select(x => new MovieDto
+            {
+                Id = x.Id,
+                Title = x.Title,
+                OriginalTitle = x.OriginalTitle,
+                Description = x.Description,
+                Poster = x.Poster,
+                Banner = x.Banner,
+                Rating = x.Rating,
+                Year = x.Year,
+                Duration = x.Duration,
+                Director = x.Director,
+                TrailerUrl = x.TrailerUrl,
+                VideoUrl = x.VideoUrl,
+                Genres = x.Genres,
+                Cast = x.Cast
+            })
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.Chats.Commands;
@@ -22,19 +23,19 @@ public class DeleteChatMessageCommandHandler
         DeleteChatMessageCommand request,
         CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(_currentUserService.UserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         var message = await _context.ChatMessages
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (message is null)
-            throw new Exception("Mesaj tapılmadı.");
+            throw new NotFoundException("Mesaj tapılmadı.");
 
-        var currentUserId = _currentUserService.UserId;
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (message.UserId != currentUserId && !isAdmin)
-        {
-            throw new Exception("Bu mesajı silmək hüququnuz yoxdur.");
-        }
+        if (message.UserId != _currentUserService.UserId && !isAdmin)
+            throw new UnauthorizedAccessException("Bu mesajı silmək hüququnuz yoxdur.");
 
         _context.ChatMessages.Remove(message);
 

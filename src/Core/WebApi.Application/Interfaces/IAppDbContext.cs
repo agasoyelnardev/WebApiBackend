@@ -11,5 +11,6 @@ public interface IAppDbContext
     DbSet<UserFollow> UserFollows { get; }
     DbSet<Friendship> Friendships { get; }
     DbSet<AppUser> Users { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

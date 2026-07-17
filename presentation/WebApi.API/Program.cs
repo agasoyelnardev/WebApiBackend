@@ -10,7 +10,7 @@ using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
-using WebApi.Persistence.Services;
+using WebApi.Persistence.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
@@ -56,6 +56,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
 
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
@@ -63,6 +64,9 @@ builder.Services
     .AddIdentity<AppUser, IdentityRole>(options =>
     {
         options.User.RequireUniqueEmail = true;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.AllowedForNewUsers = true;
     })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -108,6 +112,8 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SendM
 
 var app = builder.Build();
 
+app.UseMiddleware<WebApi.API.Middlewares.ExceptionHandlingMiddleware>();
+
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -136,7 +142,20 @@ using (var scope = app.Services.CreateScope())
             Email = adminEmail
         };
 
-        await userManager.CreateAsync(adminUser, "Admin123!");
+        var result = await userManager.CreateAsync(
+            adminUser,
+            "Admin123!");
+
+        if (!result.Succeeded)
+        {
+            throw new Exception(
+                string.Join(", ",
+                    result.Errors.Select(x => x.Description)));
+        }
+    }
+
+    if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+    {
         await userManager.AddToRoleAsync(adminUser, "Admin");
     }
 }

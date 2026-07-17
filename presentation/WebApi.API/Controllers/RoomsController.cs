@@ -27,7 +27,7 @@ public class RoomsController : ControllerBase
         var rooms = await _mediator.Send(new GetActiveRoomsQuery());
         return Ok(rooms);
     }
-    
+
     [HttpPost("create")]
     public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand command)
     {
@@ -36,50 +36,26 @@ public class RoomsController : ControllerBase
         var roomId = await _mediator.Send(command);
         return Ok(new { Message = "Otaq yarandı", RoomId = roomId });
     }
-    
+
     [HttpDelete("{roomId}")]
     public async Task<IActionResult> DeleteRoom(Guid roomId)
     {
+        await _mediator.Send(new DeleteRoomCommand(roomId)
+        {
+            RequestedByUserId = _currentUserService.UserId
+        });
 
-        try
-        {
-            await _mediator.Send(new DeleteRoomCommand(roomId)
-            {
-                RequestedByUserId = _currentUserService.UserId
-            });
-
-            return Ok(new { Message = "Otaq silindi" });
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound(new { Message = "Otaq tapılmadı" });
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
+        return Ok(new { Message = "Otaq silindi" });
     }
-    
+
     [HttpPut("{roomId}/close")]
     public async Task<IActionResult> CloseRoom(Guid roomId)
     {
+        await _mediator.Send(new CloseRoomCommand(roomId)
+        {
+            RequestedByUserId = _currentUserService.UserId
+        });
 
-        try
-        {
-            await _mediator.Send(new CloseRoomCommand(roomId)
-            {
-                RequestedByUserId = _currentUserService.UserId
-            });
-
-            return Ok(new { Message = "Otaq bağlandı" });
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound(new { Message = "Otaq tapılmadı" });
-        }
-        catch (UnauthorizedAccessException)
-        {
-            return Forbid();
-        }
+        return Ok(new { Message = "Otaq bağlandı" });
     }
 }

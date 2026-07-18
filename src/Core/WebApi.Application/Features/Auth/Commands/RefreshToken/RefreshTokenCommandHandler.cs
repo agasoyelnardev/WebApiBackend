@@ -22,8 +22,27 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
             .Include(rt => rt.User)
             .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken, cancellationToken);
 
-        if (storedToken is null || !storedToken.IsActive)
-            throw new BadRequestException("Refresh token etibarsızdır və ya vaxtı bitib.");
+        if (storedToken is null)
+            throw new BadRequestException("Refresh token etibarsızdır.");
+
+        if (storedToken.IsRevoked)
+        {
+            // Şübhəli fəaliyyət: artıq istifadə olunmuş token yenidən göndərilib.
+            // Ehtiyat tədbiri olaraq bu istifadəçinin bütün token-lərini ləğv et.
+            var allUserTokens = await _context.RefreshTokens
+                .Where(t => t.UserId == storedToken.UserId && !t.IsRevoked)
+                .ToListAsync(cancellationToken);
+
+            foreach (var t in allUserTokens)
+                t.IsRevoked = true;
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            throw new UnauthorizedAccessException("Şübhəli fəaliyyət aşkarlandı. Zəhmət olmasa yenidən daxil olun.");
+        }
+
+        if (storedToken.IsExpired)
+            throw new BadRequestException("Refresh token-in vaxtı bitib.");
 
         storedToken.IsRevoked = true;
 

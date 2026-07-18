@@ -36,8 +36,13 @@ public class JwtService : IJwtService
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var jwtKey = _configuration["Jwt:Key"]
+                     ?? throw new InvalidOperationException("Jwt:Key appsettings.json-da təyin edilməyib.");
+
+        if (jwtKey.Length < 32)
+            throw new InvalidOperationException("Jwt:Key minimum 32 simvol (256 bit) olmalıdır.");
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

@@ -27,6 +27,12 @@ public class DeleteMovieCommandHandler
         if (movie is null)
             throw new NotFoundException("Film tapılmadı.");
 
+        var relatedReviews = await _context.Reviews
+            .Where(r => r.MovieId == request.Id)
+            .ToListAsync(cancellationToken);
+
+        _context.Reviews.RemoveRange(relatedReviews);
+        
         movie.IsDeleted = true;
         movie.UpdatedAt = DateTime.UtcNow;
 

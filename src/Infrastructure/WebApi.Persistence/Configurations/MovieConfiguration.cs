@@ -24,5 +24,11 @@ public class MovieConfiguration : IEntityTypeConfiguration<Movie>
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null) ?? new List<string>()
             );
+
+        // Kitab mənbəyi ilə əlaqə: bir kitabın çoxlu film adaptasiyası ola bilər
+        builder.HasOne(m => m.BookSource)
+            .WithMany(b => b.MovieAdaptations)
+            .HasForeignKey(m => m.BookSourceId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

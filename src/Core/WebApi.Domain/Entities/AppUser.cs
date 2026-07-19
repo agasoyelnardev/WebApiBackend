@@ -21,4 +21,9 @@ public class AppUser : IdentityUser
     // Dostluq sistemi
     public ICollection<Friendship> SentFriendRequests { get; set; } = new List<Friendship>();
     public ICollection<Friendship> ReceivedFriendRequests { get; set; } = new List<Friendship>();
+    
+    public ICollection<BookReview> BookReviews { get; set; } = [];
+    public ICollection<BookCollection> BookCollections { get; set; } = [];
+    public ICollection<BookVsMovieVote> BookVsMovieVotes { get; set; }
+        = new List<BookVsMovieVote>();
 }

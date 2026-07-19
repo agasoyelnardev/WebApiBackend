@@ -17,11 +17,11 @@ public class Movie : BaseEntity
     public string? VideoUrl { get; set; }
     public int Likes { get; set; }
     
-    // AI-ın təklif etdiyi vacib siyahılar:
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();
-    public string? BookAdaptationId { get; set; }
     
-    // İlişki (Relationship):
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    
+    public Guid? BookSourceId { get; set; }
+    public virtual Book? BookSource { get; set; }
 }

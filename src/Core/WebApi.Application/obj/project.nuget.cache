@@ -1,9 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "2+BFG1WdnXg=",
+  "dgSpecHash": "KyhwDn4To8g=",
   "success": true,
   "projectFilePath": "/Users/peyman/Desktop/WebApi/src/Core/WebApi.Application/WebApi.Application.csproj",
   "expectedPackageFiles": [
+    "/Users/peyman/.nuget/packages/google.apis/1.75.0/google.apis.1.75.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/google.apis.auth/1.75.0/google.apis.auth.1.75.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/google.apis.core/1.75.0/google.apis.core.1.75.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/mediatr/14.2.0/mediatr.14.2.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/mediatr.contracts/2.0.1/mediatr.contracts.2.0.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.10.0.0.nupkg.sha512",
@@ -15,7 +18,10 @@
     "/Users/peyman/.nuget/packages/microsoft.identitymodel.abstractions/8.14.0/microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.14.0/microsoft.identitymodel.jsonwebtokens.8.14.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identitymodel.logging/8.14.0/microsoft.identitymodel.logging.8.14.0.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512"
+    "/Users/peyman/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/system.codedom/7.0.0/system.codedom.7.0.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/system.management/7.0.2/system.management.7.0.2.nupkg.sha512"
   ],
   "logs": [
     {

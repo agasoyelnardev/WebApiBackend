@@ -299,6 +299,269 @@ namespace WebApi.Persistence.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Cover")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DownloadUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsNewRelease")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTopRated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsTrending")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PdfUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Books");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookCollection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cover")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BookCollections");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookCollectionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookCollectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookCollectionId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("BookCollectionItems");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookReview", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Dislikes")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BookReviews");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovie", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BookVotes")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("MovieVotes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("BookVsMovies");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovieVote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookVsMovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Choice")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("BookVsMovieId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("BookVsMovieVotes");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.ChatMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -353,8 +616,8 @@ namespace WebApi.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BookAdaptationId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("BookSourceId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Cast")
                         .IsRequired()
@@ -414,6 +677,8 @@ namespace WebApi.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookSourceId");
 
                     b.ToTable("Movies");
                 });
@@ -685,6 +950,93 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("Following");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.BookCollection", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany("BookCollections")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookCollectionItem", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.BookCollection", "BookCollection")
+                        .WithMany("BookItems")
+                        .HasForeignKey("BookCollectionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany("CollectionItems")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("BookCollection");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookReview", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany("Reviews")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany("BookReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovie", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovieVote", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.BookVsMovie", "BookVsMovie")
+                        .WithMany("Votes")
+                        .HasForeignKey("BookVsMovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany("BookVsMovieVotes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BookVsMovie");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.ChatMessage", b =>
                 {
                     b.HasOne("WebApi.Domain.Entities.StreamRoom", "StreamRoom")
@@ -694,6 +1046,16 @@ namespace WebApi.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("StreamRoom");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.Movie", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Book", "BookSource")
+                        .WithMany("MovieAdaptations")
+                        .HasForeignKey("BookSourceId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BookSource");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.RefreshToken", b =>
@@ -745,6 +1107,12 @@ namespace WebApi.Persistence.Migrations
 
             modelBuilder.Entity("WebApi.Domain.Entities.AppUser", b =>
                 {
+                    b.Navigation("BookCollections");
+
+                    b.Navigation("BookReviews");
+
+                    b.Navigation("BookVsMovieVotes");
+
                     b.Navigation("Followers");
 
                     b.Navigation("Following");
@@ -756,6 +1124,25 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("SentFriendRequests");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.Book", b =>
+                {
+                    b.Navigation("CollectionItems");
+
+                    b.Navigation("MovieAdaptations");
+
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookCollection", b =>
+                {
+                    b.Navigation("BookItems");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovie", b =>
+                {
+                    b.Navigation("Votes");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.Movie", b =>

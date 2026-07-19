@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.API.Services;
+namespace WebApi.Persistence.Service;
 
 public class CurrentUserService : ICurrentUserService
 {

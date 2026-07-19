@@ -5,7 +5,6 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using WebApi.API.Services;
 using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
@@ -74,7 +73,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IAppDbContext, AppDbContext>();
-
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services
     .AddIdentity<AppUser, IdentityRole>(options =>

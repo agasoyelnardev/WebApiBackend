@@ -50,4 +50,6 @@ public class AuthController : ControllerBase
         await _mediator.Send(command);
         return Ok(new { Message = "Uğurla çıxış edildi." });
     }
+    
+
 }

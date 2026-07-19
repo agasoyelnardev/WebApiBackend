@@ -23,6 +23,12 @@ namespace WebApi.Persistence.Data;
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
+        public DbSet<Book> Books { get; set; }
+        public DbSet<BookReview> BookReviews { get; set; }
+        public DbSet<BookCollection> BookCollections { get; set; }
+        public DbSet<BookCollectionItem> BookCollectionItems { get; set; }
+        public DbSet<BookVsMovie> BookVsMovies { get; set; }
+        public DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

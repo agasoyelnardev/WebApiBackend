@@ -13,4 +13,10 @@ public interface IAppDbContext
     DbSet<AppUser> Users { get; }
     DbSet<RefreshToken> RefreshTokens { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    DbSet<Book> Books { get; }
+    DbSet<BookReview> BookReviews { get; }
+    DbSet<BookCollection> BookCollections { get; }
+    DbSet<BookCollectionItem> BookCollectionItems { get; }
+    DbSet<BookVsMovie> BookVsMovies { get; } 
+    DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
 }

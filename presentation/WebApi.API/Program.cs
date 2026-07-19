@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -28,6 +29,21 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials();
     });
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("AuthPolicy", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -118,6 +134,7 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
     if (!await roleManager.RoleExistsAsync("Admin"))
     {
@@ -129,7 +146,12 @@ using (var scope = app.Services.CreateScope())
         await roleManager.CreateAsync(new IdentityRole("User"));
     }
 
-    var adminEmail = "admin@gmail.com";
+    var adminEmail = configuration["AdminUser:Email"]
+                     ?? throw new InvalidOperationException("AdminUser:Email təyin edilməyib.");
+    var adminPassword = configuration["AdminUser:Password"]
+                        ?? throw new InvalidOperationException("AdminUser:Password təyin edilməyib.");
+    var adminUserName = configuration["AdminUser:UserName"] ?? "admin";
+    var adminFullName = configuration["AdminUser:FullName"] ?? "System Admin";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -137,20 +159,17 @@ using (var scope = app.Services.CreateScope())
     {
         adminUser = new AppUser
         {
-            FullName = "System Admin",
-            UserName = "admin",
+            FullName = adminFullName,
+            UserName = adminUserName,
             Email = adminEmail
         };
 
-        var result = await userManager.CreateAsync(
-            adminUser,
-            "Admin123!");
+        var result = await userManager.CreateAsync(adminUser, adminPassword);
 
         if (!result.Succeeded)
         {
             throw new Exception(
-                string.Join(", ",
-                    result.Errors.Select(x => x.Description)));
+                string.Join(", ", result.Errors.Select(x => x.Description)));
         }
     }
 
@@ -170,6 +189,8 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors("AllowFrontend");
+
+app.UseRateLimiter(); 
 
 app.UseAuthentication();
 app.UseAuthorization();

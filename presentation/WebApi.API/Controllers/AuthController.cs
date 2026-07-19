@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Application.Features.Auth.Commands.Login;
 using WebApi.Application.Features.Auth.Commands.Register;
 using WebApi.Application.Features.Auth.Commands.RefreshToken;
@@ -19,6 +20,7 @@ public class AuthController : ControllerBase
         _mediator = mediator;
     }
 
+    [EnableRateLimiting("AuthPolicy")]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterCommand command)
     {
@@ -26,6 +28,7 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [EnableRateLimiting("AuthPolicy")]
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginCommand command)
     {

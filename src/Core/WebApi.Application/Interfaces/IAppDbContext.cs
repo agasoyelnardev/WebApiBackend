@@ -19,4 +19,7 @@ public interface IAppDbContext
     DbSet<BookCollectionItem> BookCollectionItems { get; }
     DbSet<BookVsMovie> BookVsMovies { get; } 
     DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
+     DbSet<MovieCollection> MovieCollections { get; set; } 
+     DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
+
 }

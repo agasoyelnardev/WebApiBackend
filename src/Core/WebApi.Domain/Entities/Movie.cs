@@ -21,6 +21,7 @@ public class Movie : BaseEntity
     public List<string> Cast { get; set; } = new();
     
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<MovieCollectionItem> MovieCollectionItems { get; set; } = new List<MovieCollectionItem>();
     
     public Guid? BookSourceId { get; set; }
     public virtual Book? BookSource { get; set; }

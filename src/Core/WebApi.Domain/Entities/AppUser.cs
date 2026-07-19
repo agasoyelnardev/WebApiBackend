@@ -22,6 +22,9 @@ public class AppUser : IdentityUser
     public ICollection<Friendship> SentFriendRequests { get; set; } = new List<Friendship>();
     public ICollection<Friendship> ReceivedFriendRequests { get; set; } = new List<Friendship>();
     
+    public ICollection<MovieCollection> MovieCollections { get; set; }
+        = new List<MovieCollection>();
+    
     public ICollection<BookReview> BookReviews { get; set; } = [];
     public ICollection<BookCollection> BookCollections { get; set; } = [];
     public ICollection<BookVsMovieVote> BookVsMovieVotes { get; set; }

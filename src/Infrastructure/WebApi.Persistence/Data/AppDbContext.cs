@@ -16,7 +16,6 @@ namespace WebApi.Persistence.Data;
         public DbSet<StreamRoom> StreamRooms { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Review> Reviews { get; set; }
-        public DbSet<MovieCollection> MovieCollections { get; set; }
         public DbSet<Movie> Movies { get; set; }
         
         public DbSet<UserFollow> UserFollows { get; set; }
@@ -29,6 +28,10 @@ namespace WebApi.Persistence.Data;
         public DbSet<BookCollectionItem> BookCollectionItems { get; set; }
         public DbSet<BookVsMovie> BookVsMovies { get; set; }
         public DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
+        public DbSet<MovieCollection> MovieCollections { get; set; } 
+        public DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

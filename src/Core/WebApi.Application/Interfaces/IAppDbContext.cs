@@ -21,5 +21,6 @@ public interface IAppDbContext
     DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
      DbSet<MovieCollection> MovieCollections { get; set; } 
      DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
+     DbSet<Notification> Notifications { get; set; }
 
 }

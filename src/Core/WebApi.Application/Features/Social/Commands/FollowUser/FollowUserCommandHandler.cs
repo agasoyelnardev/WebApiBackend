@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Social.Commands.FollowUser;
 
@@ -10,10 +9,12 @@ public class FollowUserCommandHandler
     : IRequestHandler<FollowUserCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly INotificationService _notificationService;
 
-    public FollowUserCommandHandler(IAppDbContext context)
+    public FollowUserCommandHandler(IAppDbContext context, INotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     public async Task<bool> Handle(
@@ -45,6 +46,17 @@ public class FollowUserCommandHandler
 
         await _context.UserFollows.AddAsync(follow, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        var follower = await _context.Users.FirstOrDefaultAsync(
+            u => u.Id == request.FollowerUserId, cancellationToken);
+
+        await _notificationService.NotifyAsync(
+            userId: request.FollowingUserId,
+            type: "follower",
+            title: "Yeni izləyici",
+            description: $"{follower?.UserName ?? "Bir istifadəçi"} sizi izləməyə başladı.",
+            relatedEntityId: null,
+            cancellationToken: cancellationToken);
 
         return true;
     }

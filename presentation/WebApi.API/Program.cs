@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Interfaces;
+using WebApi.Application.Services;
 using WebApi.Domain.Entities;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
@@ -17,6 +18,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
@@ -112,7 +114,8 @@ builder.Services.AddAuthentication(options =>
                 var accessToken = context.Request.Query["access_token"];
                 var path = context.HttpContext.Request.Path;
 
-                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub"))
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    (path.StartsWithSegments("/chathub") || path.StartsWithSegments("/notificationhub")))
                 {
                     context.Token = accessToken;
                 }
@@ -196,4 +199,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<WebApi.Application.Hubs.ChatHub>("/chathub").RequireAuthorization();
+app.MapHub<WebApi.Application.Hubs.NotificationHub>("/notificationhub").RequireAuthorization();
 app.Run();

@@ -30,7 +30,7 @@ namespace WebApi.Persistence.Data;
         public DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
         public DbSet<MovieCollection> MovieCollections { get; set; } 
         public DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
-
+        public DbSet<Notification> Notifications { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

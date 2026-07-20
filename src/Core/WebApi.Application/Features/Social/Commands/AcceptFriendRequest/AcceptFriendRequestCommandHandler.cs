@@ -10,10 +10,12 @@ public class AcceptFriendRequestCommandHandler
     : IRequestHandler<AcceptFriendRequestCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly INotificationService _notificationService;
 
-    public AcceptFriendRequestCommandHandler(IAppDbContext context)
+    public AcceptFriendRequestCommandHandler(IAppDbContext context, INotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     public async Task<bool> Handle(
@@ -38,6 +40,17 @@ public class AcceptFriendRequestCommandHandler
         friendship.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        var accepter = await _context.Users.FirstOrDefaultAsync(
+            u => u.Id == request.UserId, cancellationToken);
+
+        await _notificationService.NotifyAsync(
+            userId: friendship.SenderId,
+            type: "friend_request_accepted",
+            title: "Dostluq sorğusu qəbul edildi",
+            description: $"{accepter?.UserName ?? "Bir istifadəçi"} dostluq sorğunuzu qəbul etdi.",
+            relatedEntityId: friendship.Id,
+            cancellationToken: cancellationToken);
 
         return true;
     }

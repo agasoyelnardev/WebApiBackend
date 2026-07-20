@@ -31,6 +31,15 @@ public class UpdateMovieCommandHandler
         if (request.Genres is null || !request.Genres.Any())
             throw new BadRequestException("Ən azı bir janr seçilməlidir.");
 
+        if (request.BookSourceId.HasValue)
+        {
+            var bookExists = await _context.Books.AnyAsync(
+                b => b.Id == request.BookSourceId.Value && !b.IsDeleted, cancellationToken);
+
+            if (!bookExists)
+                throw new NotFoundException("Göstərilən kitab tapılmadı.");
+        }
+
         var movie = await _context.Movies
             .FirstOrDefaultAsync(
                 x => x.Id == request.Id && !x.IsDeleted,
@@ -51,7 +60,7 @@ public class UpdateMovieCommandHandler
         movie.VideoUrl = request.VideoUrl;
         movie.Genres = request.Genres;
         movie.Cast = request.Cast;
-
+        movie.BookSourceId = request.BookSourceId;   // ← YENİ
         movie.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);

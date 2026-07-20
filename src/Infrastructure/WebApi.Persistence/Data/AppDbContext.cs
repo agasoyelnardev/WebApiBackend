@@ -31,7 +31,11 @@ namespace WebApi.Persistence.Data;
         public DbSet<MovieCollection> MovieCollections { get; set; } 
         public DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
         public DbSet<Notification> Notifications { get; set; }
-
+        public DbSet<UserMovieList> UserMovieLists { get; set; }
+        public DbSet<UserBookFavorite> UserBookFavorites { get; set; }
+        public DbSet<Discussion> Discussions { get; }
+        public DbSet<Comment> Comments { get; }
+        public DbSet<DiscussionLike> DiscussionLikes { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

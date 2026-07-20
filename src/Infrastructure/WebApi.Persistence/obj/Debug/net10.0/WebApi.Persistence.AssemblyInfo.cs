@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebApi.Persistence")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e304274bc5df4e84c5e785335cac030c789e516b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d56d87de7278f058680c30d946593c0adf3af8a2")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebApi.Persistence")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebApi.Persistence")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

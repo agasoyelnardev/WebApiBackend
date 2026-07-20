@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Collections.Concurrent;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -13,13 +12,13 @@ public class ChatHub : Hub
 {
     private readonly IMediator _mediator;
     private readonly IChatRepository _repository;
+    private readonly IRoomPresenceService _presenceService;
 
-    private static readonly ConcurrentDictionary<string, string> ConnectionRooms = new();
-
-    public ChatHub(IMediator mediator, IChatRepository repository)
+    public ChatHub(IMediator mediator, IChatRepository repository, IRoomPresenceService presenceService)
     {
         _mediator = mediator;
         _repository = repository;
+        _presenceService = presenceService;
     }
 
     public async Task JoinRoom(string roomId)
@@ -34,8 +33,12 @@ public class ChatHub : Hub
         if (!room.IsLive)
             throw new HubException("Bu otaq bağlıdır");
 
+        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId is null)
+            throw new HubException("İstifadəçi doğrulanmadı");
+
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        ConnectionRooms[Context.ConnectionId] = roomId;
+        _presenceService.AddConnection(roomId, userId, Context.ConnectionId);
 
         await _repository.IncrementViewerCountAsync(roomGuid);
 
@@ -44,32 +47,62 @@ public class ChatHub : Hub
 
     public async Task LeaveRoom(string roomId)
     {
-        if (!Guid.TryParse(roomId, out var roomGuid))
-            throw new HubException("Otaq ID formatı yanlışdır");
-
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
-        ConnectionRooms.TryRemove(Context.ConnectionId, out _);
-
-        await _repository.DecrementViewerCountAsync(roomGuid);
-
-        var room = await _repository.GetRoomByIdAsync(roomGuid);
-        if (room is not null)
-            await Clients.Group(roomId).SendAsync("ViewerCountChanged", room.ViewerCount);
+        await HandleLeaveAsync(roomId, Context.ConnectionId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (ConnectionRooms.TryRemove(Context.ConnectionId, out var roomId)
-            && Guid.TryParse(roomId, out var roomGuid))
-        {
-            await _repository.DecrementViewerCountAsync(roomGuid);
+        var roomId = _presenceService.RemoveConnection(Context.ConnectionId, out var userFullyLeft);
 
-            var room = await _repository.GetRoomByIdAsync(roomGuid);
-            if (room is not null)
-                await Clients.Group(roomId).SendAsync("ViewerCountChanged", room.ViewerCount);
+        if (roomId is not null && userFullyLeft)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+            await FinalizeLeaveAsync(roomId);
         }
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    private async Task HandleLeaveAsync(string roomId, string connectionId)
+    {
+        var removedRoomId = _presenceService.RemoveConnection(connectionId, out var userFullyLeft);
+
+        await Groups.RemoveFromGroupAsync(connectionId, roomId);
+
+        if (userFullyLeft && removedRoomId is not null)
+            await FinalizeLeaveAsync(removedRoomId);
+    }
+
+    private async Task FinalizeLeaveAsync(string roomId)
+    {
+        if (!Guid.TryParse(roomId, out var roomGuid))
+            return;
+
+        await _repository.DecrementViewerCountAsync(roomGuid);
+
+        var room = await _repository.GetRoomByIdAsync(roomGuid);
+        if (room is null)
+            return;
+
+        await Clients.Group(roomId).SendAsync("ViewerCountChanged", room.ViewerCount);
+
+        // Əgər çıxan şəxs host idisə, avtomatik yeni host təyin et
+        var leavingUserId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (leavingUserId is not null && room.CreatedByUserId == leavingUserId)
+        {
+            var newHost = _presenceService.GetAnyOtherParticipant(roomId, leavingUserId);
+
+            if (newHost is not null)
+            {
+                room.CreatedByUserId = newHost;
+                await _repository.SaveChangesAsync();
+
+                await Clients.Group(roomId).SendAsync("HostChanged", new { NewHostUserId = newHost });
+            }
+            // Otaqda heç kim qalmayıbsa, host dəyişmir — otaq "sahibsiz" qalır,
+            // sonrakı JoinRoom-larda host hələ də köhnə istifadəçidir (praktiki əhəmiyyəti yoxdur, çünki heç kim yoxdur)
+        }
     }
 
     public async Task SendMessage(string roomId, string messageText)
@@ -119,7 +152,6 @@ public class ChatHub : Hub
         if (room.CreatedByUserId != userId)
             throw new HubException("Yalnız otaq sahibi videonu idarə edə bilər");
 
-        // action: "play", "pause", "seek"
         await Clients.OthersInGroup(roomId).SendAsync("PlaybackSync", new
         {
             Action = action,

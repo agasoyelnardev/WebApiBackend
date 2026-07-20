@@ -17,10 +17,14 @@ public interface IAppDbContext
     DbSet<BookReview> BookReviews { get; }
     DbSet<BookCollection> BookCollections { get; }
     DbSet<BookCollectionItem> BookCollectionItems { get; }
-    DbSet<BookVsMovie> BookVsMovies { get; } 
+    DbSet<BookVsMovie> BookVsMovies { get; }
     DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
-     DbSet<MovieCollection> MovieCollections { get; set; } 
-     DbSet<MovieCollectionItem> MovieCollectionItems { get; set; } 
-     DbSet<Notification> Notifications { get; set; }
-
+    DbSet<MovieCollection> MovieCollections { get; set; }
+    DbSet<MovieCollectionItem> MovieCollectionItems { get; set; }
+    DbSet<Notification> Notifications { get; set; }
+    DbSet<UserMovieList> UserMovieLists { get; }
+    DbSet<UserBookFavorite> UserBookFavorites { get; }
+    DbSet<Discussion> Discussions { get; }
+    DbSet<Comment> Comments { get; }
+    DbSet<DiscussionLike> DiscussionLikes { get; }
 }

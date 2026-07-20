@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
@@ -31,6 +32,15 @@ public class CreateMovieCommandHandler
         if (request.Genres is null || !request.Genres.Any())
             throw new BadRequestException("Ən azı bir janr seçilməlidir.");
 
+        if (request.BookSourceId.HasValue)
+        {
+            var bookExists = await _context.Books.AnyAsync(
+                b => b.Id == request.BookSourceId.Value && !b.IsDeleted, cancellationToken);
+
+            if (!bookExists)
+                throw new NotFoundException("Göstərilən kitab tapılmadı.");
+        }
+
         var movie = new Movie
         {
             Title = request.Title,
@@ -45,7 +55,8 @@ public class CreateMovieCommandHandler
             TrailerUrl = request.TrailerUrl,
             VideoUrl = request.VideoUrl,
             Genres = request.Genres,
-            Cast = request.Cast
+            Cast = request.Cast,
+            BookSourceId = request.BookSourceId
         };
 
         await _context.Movies.AddAsync(movie, cancellationToken);

@@ -35,7 +35,16 @@ public class GetMovieByIdQueryHandler
                 TrailerUrl = x.TrailerUrl,
                 VideoUrl = x.VideoUrl,
                 Genres = x.Genres,
-                Cast = x.Cast
+                Cast = x.Cast,
+                BookSource = x.BookSource != null && !x.BookSource.IsDeleted
+                    ? new BookSourceDto
+                    {
+                        Id = x.BookSource.Id,
+                        Title = x.BookSource.Title,
+                        Author = x.BookSource.Author,
+                        Cover = x.BookSource.Cover
+                    }
+                    : null
             })
             .FirstOrDefaultAsync(cancellationToken);
     }

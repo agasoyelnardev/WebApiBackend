@@ -58,4 +58,17 @@ public class RoomsController : ControllerBase
 
         return Ok(new { Message = "Otaq bağlandı" });
     }
+    
+    [HttpPut("{roomId}/transfer-host/{newHostUserId}")]
+    public async Task<IActionResult> TransferHost(Guid roomId, string newHostUserId)
+    {
+        await _mediator.Send(new TransferHostCommand
+        {
+            RoomId = roomId,
+            NewHostUserId = newHostUserId,
+            RequestedByUserId = _currentUserService.UserId
+        });
+
+        return Ok(new { Message = "Host statusu ötürüldü" });
+    }
 }

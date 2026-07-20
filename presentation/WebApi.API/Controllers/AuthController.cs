@@ -6,6 +6,8 @@ using WebApi.Application.Features.Auth.Commands.Login;
 using WebApi.Application.Features.Auth.Commands.Register;
 using WebApi.Application.Features.Auth.Commands.RefreshToken;
 using WebApi.Application.Features.Auth.Commands.Logout;
+using WebApi.Application.Features.Users.Queries.GetCurrentUser;
+using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
 
@@ -14,10 +16,12 @@ namespace WebApi.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ICurrentUserService _currentUserService;
 
-    public AuthController(IMediator mediator)
+    public AuthController(IMediator mediator, ICurrentUserService currentUserService)
     {
         _mediator = mediator;
+        _currentUserService = currentUserService;
     }
 
     [EnableRateLimiting("AuthPolicy")]
@@ -50,6 +54,12 @@ public class AuthController : ControllerBase
         await _mediator.Send(command);
         return Ok(new { Message = "Uğurla çıxış edildi." });
     }
-    
 
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> Me()
+    {
+        var result = await _mediator.Send(new GetCurrentUserQuery(_currentUserService.UserId));
+        return Ok(result);
+    }
 }

@@ -17,4 +17,5 @@ public class CreateMovieCommand : IRequest<Guid>
 
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();
+    public Guid? BookSourceId { get; set; }
 }

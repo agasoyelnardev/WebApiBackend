@@ -19,6 +19,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IRoomPresenceService, RoomPresenceService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

@@ -34,7 +34,17 @@ public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDto
                 CustomContent = x.CustomContent,
                 IsTrending = x.IsTrending,
                 IsTopRated = x.IsTopRated,
-                IsNewRelease = x.IsNewRelease
+                IsNewRelease = x.IsNewRelease,
+                MovieAdaptations = x.MovieAdaptations
+                    .Where(m => !m.IsDeleted)
+                    .Select(m => new MovieAdaptationDto
+                    {
+                        Id = m.Id,
+                        Title = m.Title,
+                        Poster = m.Poster,
+                        Year = m.Year
+                    })
+                    .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
     }

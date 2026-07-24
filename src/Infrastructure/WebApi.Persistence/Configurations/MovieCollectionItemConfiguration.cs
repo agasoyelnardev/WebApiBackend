@@ -14,7 +14,7 @@ public class MovieCollectionItemConfiguration
             .HasForeignKey(x => x.MovieCollectionId);
 
         builder.HasOne(x => x.Movie)
-            .WithMany()
+            .WithMany(m => m.MovieCollectionItems)  
             .HasForeignKey(x => x.MovieId);
 
         builder.HasIndex(x => new

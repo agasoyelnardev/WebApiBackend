@@ -33,9 +33,20 @@ namespace WebApi.Persistence.Data;
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserMovieList> UserMovieLists { get; set; }
         public DbSet<UserBookFavorite> UserBookFavorites { get; set; }
-        public DbSet<Discussion> Discussions { get; }
-        public DbSet<Comment> Comments { get; }
-        public DbSet<DiscussionLike> DiscussionLikes { get; }
+        public DbSet<Discussion> Discussions { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<DiscussionLike> DiscussionLikes { get; set; }
+        public DbSet<ReadingProgress> ReadingProgresses { get; set; }
+        public DbSet<MovieLike> MovieLikes { get; set;}
+        public DbSet<BookLike> BookLikes { get; set;}
+        public DbSet<SavedMovieCollection> SavedMovieCollections { get; set;}
+        public DbSet<MovieCollectionLike> MovieCollectionLikes { get; set;}
+        public DbSet<WatchHistory> WatchHistories { get; set; }
+        public DbSet<UserBookWatchlistItem> UserBookWatchlistItems { get; set; }
+        public DbSet<ReviewLike> ReviewLikes { get; set; }
+        public DbSet<BookReviewLike> BookReviewLikes { get; set; }   
+        public DbSet<BookCollectionLike> BookCollectionLikes { get; }
+        public DbSet<SavedBookCollection> SavedBookCollections { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

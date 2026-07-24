@@ -77,7 +77,8 @@ public class GetFilteredMoviesQueryHandler : IRequestHandler<GetFilteredMoviesQu
                 TrailerUrl = m.TrailerUrl,
                 VideoUrl = m.VideoUrl,
                 Genres = m.Genres,
-                Cast = m.Cast
+                Cast = m.Cast,
+                Likes = m.Likes
             })
             .ToListAsync(cancellationToken);
     }

@@ -14,15 +14,18 @@ public class CreateReviewCommandHandler
     private readonly IAppDbContext _context;
     private readonly ICurrentUserService _currentUserService;
     private readonly IPublisher _publisher;
+    private readonly IPointsService _pointsService;
 
     public CreateReviewCommandHandler(
         IAppDbContext context,
         ICurrentUserService currentUserService,
-        IPublisher publisher)
+        IPublisher publisher,
+        IPointsService pointsService)
     {
         _context = context;
         _currentUserService = currentUserService;
         _publisher = publisher;
+        _pointsService = pointsService;
     }
 
     public async Task<Guid> Handle(
@@ -64,7 +67,8 @@ public class CreateReviewCommandHandler
         await _context.SaveChangesAsync(cancellationToken);
 
         await _publisher.Publish(new MovieRatingChangedEvent(review.MovieId), cancellationToken);
-
+        await _pointsService.AwardPointsAsync(_currentUserService.UserId, PointAction.AddReview, cancellationToken);
+        
         return review.Id;
     }
 }

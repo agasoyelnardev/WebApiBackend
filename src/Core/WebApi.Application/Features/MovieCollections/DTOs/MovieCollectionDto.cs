@@ -9,4 +9,7 @@ public class MovieCollectionDto
     public bool IsPublic { get; set; }
     public string AppUserId { get; set; } = string.Empty;
     public int MovieCount { get; set; }
+    public bool IsSaved { get; set; }
+    public int LikesCount { get; set; }          
+    public bool IsLikedByCurrentUser { get; set; }
 }

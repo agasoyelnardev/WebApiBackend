@@ -48,7 +48,20 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, C
             .Where(x => x.UserId == request.UserId)
             .Select(x => x.BookId)
             .ToListAsync(cancellationToken);
+        
+        var readingProgress = await _context.ReadingProgresses
+            .Where(x => x.UserId == request.UserId)
+            .ToDictionaryAsync(x => x.BookId, x => x.PercentageComplete, cancellationToken);
 
+        var followingUserIds = await _context.UserFollows
+            .Where(f => f.FollowerId == request.UserId)
+            .Select(f => f.FollowingId)
+            .ToListAsync(cancellationToken);
+        
+        var bookVotes = await _context.BookVsMovieVotes
+            .Where(v => v.UserId == request.UserId)
+            .ToDictionaryAsync(v => v.BookVsMovieId, v => v.Choice.ToString(), cancellationToken);
+        
         return new CurrentUserDto
         {
             Id = user.Id,
@@ -62,7 +75,12 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, C
             FollowingCount = followingCount,
             FavoriteMovieIds = favoriteIds,
             WatchlistMovieIds = watchlistIds,
-            FavoriteBookIds = favoriteBookIds
+            FavoriteBookIds = favoriteBookIds,
+            ReadingProgress = readingProgress,
+            FollowingUserIds = followingUserIds,
+            BookVotes = bookVotes,
+            IsPremium = user.IsPremium,
+            PremiumEndDate = user.PremiumEndDate
         };
     }
 }

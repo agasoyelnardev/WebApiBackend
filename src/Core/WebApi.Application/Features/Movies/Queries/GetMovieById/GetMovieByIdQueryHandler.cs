@@ -36,6 +36,9 @@ public class GetMovieByIdQueryHandler
                 VideoUrl = x.VideoUrl,
                 Genres = x.Genres,
                 Cast = x.Cast,
+                Likes = x.Likes,
+                IsLikedByCurrentUser = request.RequestingUserId != null &&
+                                       _context.MovieLikes.Any(l => l.MovieId == x.Id && l.UserId == request.RequestingUserId),
                 BookSource = x.BookSource != null && !x.BookSource.IsDeleted
                     ? new BookSourceDto
                     {

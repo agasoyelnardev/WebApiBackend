@@ -29,6 +29,14 @@ public class GetMovieCollectionByIdQueryHandler
                 CoverImageUrl = c.CoverImageUrl,
                 IsPublic = c.IsPublic,
                 AppUserId = c.AppUserId,
+                MovieCount = c.Items.Count,
+                LikesCount = c.Likes.Count,
+                IsSaved = request.RequestingUserId != null &&
+                    _context.SavedMovieCollections.Any(
+                        s => s.MovieCollectionId == c.Id && s.UserId == request.RequestingUserId),
+                IsLikedByCurrentUser = request.RequestingUserId != null &&
+                    c.Likes.Any(l => l.UserId == request.RequestingUserId),
+
                 Movies = c.Items
                     .Where(i => !i.Movie.IsDeleted)
                     .Select(i => new MovieSummaryDto

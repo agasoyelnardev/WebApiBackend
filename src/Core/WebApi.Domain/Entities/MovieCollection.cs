@@ -13,4 +13,6 @@ public class MovieCollection : BaseEntity
     public AppUser AppUser { get; set; } = null!;
 
     public ICollection<MovieCollectionItem> Items { get; set; } = new List<MovieCollectionItem>();
+   
+    public virtual ICollection<MovieCollectionLike> Likes { get; set; } = new List<MovieCollectionLike>();
 }

@@ -15,6 +15,13 @@ public class CurrentUserDto
 
     // Yüngül ID siyahıları — ürək/bookmark ikonlarının statusunu yoxlamaq üçün
     public List<Guid> FavoriteMovieIds { get; set; } = new();
+    public List<string> FollowingUserIds { get; set; } = new();
     public List<Guid> WatchlistMovieIds { get; set; } = new();
     public List<Guid> FavoriteBookIds { get; set; } = new();
+    public Dictionary<Guid, int> ReadingProgress { get; set; } = new();
+    public Dictionary<Guid, string> BookVotes { get; set; } = new(); 
+    
+    public bool IsPremium { get; set; }             
+    public DateTime? PremiumEndDate { get; set; }
+    
 }

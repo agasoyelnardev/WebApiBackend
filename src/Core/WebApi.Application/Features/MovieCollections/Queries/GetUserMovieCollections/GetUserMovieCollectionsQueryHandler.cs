@@ -37,7 +37,13 @@ public class GetUserMovieCollectionsQueryHandler
                 CoverImageUrl = c.CoverImageUrl,
                 IsPublic = c.IsPublic,
                 AppUserId = c.AppUserId,
-                MovieCount = c.Items.Count
+                MovieCount = c.Items.Count,
+                LikesCount = c.Likes.Count,
+                IsSaved = !isOwner && (!string.IsNullOrEmpty(request.RequestingUserId) && 
+                                       _context.SavedMovieCollections.Any(
+                                           s => s.MovieCollectionId == c.Id && s.UserId == request.RequestingUserId)),
+                IsLikedByCurrentUser = !string.IsNullOrEmpty(request.RequestingUserId) &&
+                                       c.Likes.Any(l => l.UserId == request.RequestingUserId)
             })
             .ToListAsync(cancellationToken);
     }

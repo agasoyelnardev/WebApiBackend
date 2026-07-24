@@ -27,4 +27,15 @@ public interface IAppDbContext
     DbSet<Discussion> Discussions { get; }
     DbSet<Comment> Comments { get; }
     DbSet<DiscussionLike> DiscussionLikes { get; }
+    DbSet<ReadingProgress> ReadingProgresses { get; }
+    DbSet<MovieLike> MovieLikes { get; }
+    DbSet<BookLike> BookLikes { get; }
+    DbSet<SavedMovieCollection> SavedMovieCollections { get; }
+    DbSet<MovieCollectionLike> MovieCollectionLikes { get; }
+    DbSet<WatchHistory> WatchHistories { get; }
+    DbSet<UserBookWatchlistItem> UserBookWatchlistItems { get; }
+    DbSet<ReviewLike> ReviewLikes { get; }
+    DbSet<BookReviewLike> BookReviewLikes { get; set; }
+    DbSet<BookCollectionLike> BookCollectionLikes { get; }
+    DbSet<SavedBookCollection> SavedBookCollections { get; }
 }

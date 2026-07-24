@@ -1,5 +1,6 @@
 namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
 
+
 public class MovieDto
 {
     public Guid Id { get; set; }
@@ -16,5 +17,8 @@ public class MovieDto
     public string? VideoUrl { get; set; }
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();
+    public int Likes { get; set; }                        
+    public bool IsLikedByCurrentUser { get; set; }       
+
     public BookSourceDto? BookSource { get; set; }
 }

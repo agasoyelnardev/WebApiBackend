@@ -7,6 +7,7 @@ using WebApi.Application.Features.Movies.Commands.UpdateMovie;
 using WebApi.Application.Features.Movies.Queries.GetFilteredMovies;
 using WebApi.Application.Features.Movies.Queries.GetMovieById;
 using WebApi.Domain.Entities;
+using WebApi.Persistence.Service;
 
 namespace WebApi.API.Controllers;
 
@@ -15,10 +16,12 @@ namespace WebApi.API.Controllers;
 public class MoviesController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly CurrentUserService _currentUserService;
 
-    public MoviesController(IMediator mediator)
+    public MoviesController(IMediator mediator,CurrentUserService currentUserService)
     {
         _mediator = mediator;
+        _currentUserService = currentUserService;
     }
 
     [HttpGet]
@@ -31,7 +34,7 @@ public class MoviesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var movie = await _mediator.Send(new GetMovieByIdQuery(id));
+        var movie = await _mediator.Send(new GetMovieByIdQuery(id, _currentUserService.UserId));
 
         if (movie is null)
             return NotFound();

@@ -88,7 +88,8 @@ public class GetFilteredBooksQueryHandler : IRequestHandler<GetFilteredBooksQuer
                 CustomContent = b.CustomContent,
                 IsTrending = b.IsTrending,
                 IsTopRated = b.IsTopRated,
-                IsNewRelease = b.IsNewRelease
+                IsNewRelease = b.IsNewRelease,
+                Likes = b.Likes
             })
             .ToListAsync(cancellationToken);
     }

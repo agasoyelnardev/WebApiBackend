@@ -6,6 +6,7 @@ using WebApi.Application.Features.Books.Commands.DeleteBook;
 using WebApi.Application.Features.Books.Commands.UpdateBook;
 using WebApi.Application.Features.Books.Queries.GetBookById;
 using WebApi.Application.Features.Books.Queries.GetFilteredBooks;
+using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
 
@@ -14,10 +15,12 @@ namespace WebApi.API.Controllers;
 public class BooksController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ICurrentUserService _currentUserService;
 
-    public BooksController(IMediator mediator)
+    public BooksController(IMediator mediator, ICurrentUserService currentUserService)
     {
         _mediator = mediator;
+        _currentUserService = currentUserService;
     }
 
     [HttpGet]
@@ -30,7 +33,7 @@ public class BooksController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var book = await _mediator.Send(new GetBookByIdQuery(id));
+        var book = await _mediator.Send(new GetBookByIdQuery(id, _currentUserService.UserId));
 
         if (book is null)
             return NotFound();

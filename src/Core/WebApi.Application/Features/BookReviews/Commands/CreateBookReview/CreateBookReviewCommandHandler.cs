@@ -11,11 +11,18 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
 {
     private readonly IAppDbContext _context;
     private readonly IPublisher _publisher;
+    private readonly IPointsService _pointsService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public CreateBookReviewCommandHandler(IAppDbContext context, IPublisher publisher)
+    public CreateBookReviewCommandHandler(IAppDbContext context, 
+        IPublisher publisher,
+        IPointsService pointsService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _publisher = publisher;
+        _pointsService = pointsService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateBookReviewCommand request, CancellationToken cancellationToken)
@@ -57,7 +64,7 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
         await _context.SaveChangesAsync(cancellationToken);
 
         await _publisher.Publish(new BookRatingChangedEvent(review.BookId), cancellationToken);
-
+        await _pointsService.AwardPointsAsync(_currentUserService.UserId, PointAction.AddReview, cancellationToken);
         return review.Id;
     }
 }

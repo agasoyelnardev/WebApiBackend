@@ -276,6 +276,12 @@ namespace WebApi.Persistence.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PremiumEndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -439,6 +445,38 @@ namespace WebApi.Persistence.Migrations
                     b.ToTable("BookCollectionItems");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.BookLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId", "BookId")
+                        .IsUnique();
+
+                    b.ToTable("BookLikes");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.BookReview", b =>
                 {
                     b.Property<Guid>("Id")
@@ -481,6 +519,41 @@ namespace WebApi.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("BookReviews");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookReviewLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookReviewId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Choice")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookReviewId");
+
+                    b.HasIndex("UserId", "BookReviewId")
+                        .IsUnique();
+
+                    b.ToTable("BookReviewLikes");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.BookVsMovie", b =>
@@ -855,9 +928,6 @@ namespace WebApi.Persistence.Migrations
                     b.Property<Guid>("MovieId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("MovieId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -865,12 +935,74 @@ namespace WebApi.Persistence.Migrations
 
                     b.HasIndex("MovieId");
 
-                    b.HasIndex("MovieId1");
-
                     b.HasIndex("MovieCollectionId", "MovieId")
                         .IsUnique();
 
                     b.ToTable("MovieCollectionItems");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.MovieCollectionLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MovieCollectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieCollectionId");
+
+                    b.HasIndex("UserId", "MovieCollectionId")
+                        .IsUnique();
+
+                    b.ToTable("MovieCollectionLikes");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.MovieLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.HasIndex("UserId", "MovieId")
+                        .IsUnique();
+
+                    b.ToTable("MovieLikes");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.Notification", b =>
@@ -928,6 +1060,46 @@ namespace WebApi.Persistence.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.ReadingProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PercentageComplete")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId", "BookId")
+                        .IsUnique();
+
+                    b.ToTable("ReadingProgresses");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -978,8 +1150,14 @@ namespace WebApi.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Dislikes")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("MovieId")
                         .HasColumnType("uniqueidentifier");
@@ -1001,6 +1179,73 @@ namespace WebApi.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.ReviewLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Choice")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ReviewId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.HasIndex("UserId", "ReviewId")
+                        .IsUnique();
+
+                    b.ToTable("ReviewLikes");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.SavedMovieCollection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MovieCollectionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieCollectionId");
+
+                    b.HasIndex("UserId", "MovieCollectionId")
+                        .IsUnique();
+
+                    b.ToTable("SavedMovieCollections");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.StreamRoom", b =>
@@ -1091,6 +1336,38 @@ namespace WebApi.Persistence.Migrations
                     b.ToTable("UserBookFavorites");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.UserBookWatchlistItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("UserId", "BookId")
+                        .IsUnique();
+
+                    b.ToTable("UserBookWatchlistItems");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.UserMovieList", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1124,6 +1401,38 @@ namespace WebApi.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("UserMovieLists");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.WatchHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.HasIndex("UserId", "MovieId")
+                        .IsUnique();
+
+                    b.ToTable("WatchHistories");
                 });
 
             modelBuilder.Entity("Friendship", b =>
@@ -1245,6 +1554,25 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("BookCollection");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.BookLike", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.BookReview", b =>
                 {
                     b.HasOne("WebApi.Domain.Entities.Book", "Book")
@@ -1260,6 +1588,25 @@ namespace WebApi.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.BookReviewLike", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.BookReview", "BookReview")
+                        .WithMany()
+                        .HasForeignKey("BookReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("BookReview");
 
                     b.Navigation("User");
                 });
@@ -1392,18 +1739,52 @@ namespace WebApi.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
+                        .WithMany("MovieCollectionItems")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("MovieCollection");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.MovieCollectionLike", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.MovieCollection", "MovieCollection")
+                        .WithMany("Likes")
+                        .HasForeignKey("MovieCollectionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MovieCollection");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.MovieLike", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
                         .WithMany()
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApi.Domain.Entities.Movie", null)
-                        .WithMany("MovieCollectionItems")
-                        .HasForeignKey("MovieId1");
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Movie");
 
-                    b.Navigation("MovieCollection");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.Notification", b =>
@@ -1413,6 +1794,29 @@ namespace WebApi.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.ReadingProgress", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.AppUser", null)
+                        .WithMany("ReadingProgresses")
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
 
                     b.Navigation("User");
                 });
@@ -1443,6 +1847,44 @@ namespace WebApi.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Movie");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.ReviewLike", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.SavedMovieCollection", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.MovieCollection", "MovieCollection")
+                        .WithMany()
+                        .HasForeignKey("MovieCollectionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("MovieCollection");
 
                     b.Navigation("User");
                 });
@@ -1483,6 +1925,25 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WebApi.Domain.Entities.UserBookWatchlistItem", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApi.Domain.Entities.UserMovieList", b =>
                 {
                     b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
@@ -1495,6 +1956,25 @@ namespace WebApi.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Domain.Entities.WatchHistory", b =>
+                {
+                    b.HasOne("WebApi.Domain.Entities.Movie", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApi.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Movie");
@@ -1517,6 +1997,8 @@ namespace WebApi.Persistence.Migrations
                     b.Navigation("MovieCollections");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("ReadingProgresses");
 
                     b.Navigation("ReceivedFriendRequests");
 
@@ -1563,6 +2045,8 @@ namespace WebApi.Persistence.Migrations
             modelBuilder.Entity("WebApi.Domain.Entities.MovieCollection", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("WebApi.Domain.Entities.StreamRoom", b =>

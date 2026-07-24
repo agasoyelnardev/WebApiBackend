@@ -5,8 +5,11 @@ using WebApi.Application.Features.BookCollections.Commands.AddBookToCollection;
 using WebApi.Application.Features.BookCollections.Commands.CreateBookCollection;
 using WebApi.Application.Features.BookCollections.Commands.DeleteBookCollection;
 using WebApi.Application.Features.BookCollections.Commands.RemoveBookFromCollection;
+using WebApi.Application.Features.BookCollections.Commands.ToggleCollectionLike;
+using WebApi.Application.Features.BookCollections.Commands.ToggleSaveCollection;
 using WebApi.Application.Features.BookCollections.Commands.UpdateBookCollection;
 using WebApi.Application.Features.BookCollections.Queries.GetBookCollectionById;
+using WebApi.Application.Features.BookCollections.Queries.GetSavedBookCollections;
 using WebApi.Application.Features.BookCollections.Queries.GetUserCollections;
 using WebApi.Application.Interfaces;
 
@@ -97,5 +100,39 @@ public class BookCollectionsController : ControllerBase
             return NotFound();
 
         return Ok(collection);
+    }
+    
+    [Authorize]
+    [HttpPost("{id}/like")]
+    public async Task<IActionResult> ToggleLike(Guid id)
+    {
+        var isLiked = await _mediator.Send(new ToggleBookCollectionLikeCommand
+        {
+            BookCollectionId = id,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { IsLiked = isLiked });
+    }
+
+    [Authorize]
+    [HttpPost("{id}/save")]
+    public async Task<IActionResult> ToggleSave(Guid id)
+    {
+        var isSaved = await _mediator.Send(new ToggleSaveBookCollectionCommand
+        {
+            BookCollectionId = id,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { IsSaved = isSaved });
+    }
+
+    [Authorize]
+    [HttpGet("saved")]
+    public async Task<IActionResult> GetSaved()
+    {
+        var collections = await _mediator.Send(new GetSavedBookCollectionsQuery(_currentUserService.UserId));
+        return Ok(collections);
     }
 }

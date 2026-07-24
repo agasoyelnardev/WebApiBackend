@@ -1,6 +1,6 @@
 namespace WebApi.Application.Features.MovieCollections.Dtos;
 
-public class MovieCollectionDetailDto
+public class MovieCollectionDetailDto:MovieCollectionDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;

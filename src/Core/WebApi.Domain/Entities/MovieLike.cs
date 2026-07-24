@@ -1,6 +1,12 @@
+using WebApi.Domain.Entities.Base;
+
 namespace WebApi.Domain.Entities;
 
-public class MovieLike
+public class MovieLike : BaseEntity
 {
-    
+    public string UserId { get; set; } = string.Empty;
+    public virtual AppUser User { get; set; } = null!;
+
+    public Guid MovieId { get; set; }
+    public virtual Movie Movie { get; set; } = null!;
 }

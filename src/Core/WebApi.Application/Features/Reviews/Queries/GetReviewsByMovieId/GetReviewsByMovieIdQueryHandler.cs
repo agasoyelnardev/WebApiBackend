@@ -23,9 +23,16 @@ public class GetReviewsByMovieIdQueryHandler
             .Select(r => new ReviewDto
             {
                 Id =  r.Id,
-                Author = r.User.UserName ?? "Unknown",
-                Content = r.Content,
-                Rating = r.Rating
+                MovieId = r.MovieId,
+                MovieTitle = r.Movie.Title,
+                UserId = r.UserId,
+                Username = r.User.UserName ?? "Unknown",
+                UserAvatar = r.User.Avatar,
+                Rating = r.Rating,
+                Comment = r.Content,
+                Likes = 0,
+                Dislikes = 0,
+                CreatedAt = r.CreatedAt
             })
             .ToListAsync(cancellationToken);
     }

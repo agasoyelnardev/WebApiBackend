@@ -15,4 +15,7 @@ public class Review : BaseEntity
     public string UserId { get; set; } = string.Empty;
 
     public AppUser User { get; set; } = null!;
+
+    public int Likes { get; set; }
+    public int Dislikes { get; set; }  
 }

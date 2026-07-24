@@ -9,7 +9,12 @@ public class AppUser : IdentityUser
     public string Avatar { get; set; } = string.Empty;
 
     public string Bio { get; set; } = string.Empty;
-
+    
+    public int Points { get; set; } = 0;
+    
+    public DateTime? PremiumEndDate { get; set; }
+    public bool IsPremium => PremiumEndDate.HasValue && PremiumEndDate.Value > DateTime.UtcNow;
+    
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
@@ -31,4 +36,6 @@ public class AppUser : IdentityUser
     public ICollection<BookCollection> BookCollections { get; set; } = [];
     public ICollection<BookVsMovieVote> BookVsMovieVotes { get; set; }
         = new List<BookVsMovieVote>();
+    public ICollection<ReadingProgress> ReadingProgresses { get; set; }
+        = new List<ReadingProgress>();
 }

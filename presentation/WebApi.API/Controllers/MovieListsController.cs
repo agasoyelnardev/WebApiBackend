@@ -1,7 +1,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Application.Features.MovieLists.Commands.MarkMovieAsWatched;
 using WebApi.Application.Features.MovieLists.Commands.ToggleFavorite;
+using WebApi.Application.Features.MovieLists.Commands.ToggleMovieLike;
 using WebApi.Application.Features.MovieLists.Commands.ToggleWatchlist;
 using WebApi.Application.Features.MovieLists.Queries.GetUserMovieList;
 using WebApi.Application.Interfaces;
@@ -69,5 +71,30 @@ public class MovieListsController : ControllerBase
         });
 
         return Ok(movies);
+    }
+    
+    [HttpPost("likes/{movieId}/toggle")]
+    public async Task<IActionResult> ToggleLike(Guid movieId)
+    {
+        var isLiked = await _mediator.Send(new ToggleMovieLikeCommand
+        {
+            MovieId = movieId,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { IsLiked = isLiked });
+    }
+    
+    [Authorize]
+    [HttpPost("start-watching/{movieId}")]
+    public async Task<IActionResult> StartWatching(Guid movieId)
+    {
+        await _mediator.Send(new MarkMovieAsWatchedCommand
+        {
+            MovieId = movieId,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { Message = "İzləməyə başladınız" });
     }
 }

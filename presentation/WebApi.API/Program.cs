@@ -9,6 +9,7 @@ using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Interfaces;
 using WebApi.Application.Services;
 using WebApi.Domain.Entities;
+using WebApi.Infrastructure.Persistence.Services;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
 using WebApi.Persistence.Service;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IRoomPresenceService, RoomPresenceService>();
+builder.Services.AddScoped<IPointsService, PointsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

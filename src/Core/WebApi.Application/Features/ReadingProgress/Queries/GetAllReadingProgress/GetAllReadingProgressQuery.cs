@@ -1,6 +1,5 @@
+using MediatR;
+
 namespace WebApi.Application.Features.ReadingProgress.Queries.GetAllReadingProgress;
 
-public class GetAllReadingProgressQuery
-{
-    
-}
+public record GetAllReadingProgressQuery(string UserId) : IRequest<Dictionary<Guid, int>>;

@@ -18,4 +18,7 @@ public class BookDto
     public bool IsTopRated { get; set; }
     public bool IsNewRelease { get; set; }
     public List<MovieAdaptationDto> MovieAdaptations { get; set; } = new();
+    public int? MyReadingProgress { get; set; }
+    public int Likes { get; set; }                    
+    public bool IsLikedByCurrentUser { get; set; }
 }

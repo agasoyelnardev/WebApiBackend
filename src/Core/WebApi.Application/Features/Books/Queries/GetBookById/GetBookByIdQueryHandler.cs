@@ -16,7 +16,7 @@ public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDto
 
     public async Task<BookDto?> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Books
+        var book = await _context.Books
             .Where(x => x.Id == request.Id && !x.IsDeleted)
             .Select(x => new BookDto
             {
@@ -35,6 +35,9 @@ public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDto
                 IsTrending = x.IsTrending,
                 IsTopRated = x.IsTopRated,
                 IsNewRelease = x.IsNewRelease,
+                Likes = x.Likes,
+                IsLikedByCurrentUser = request.RequestingUserId != null &&
+                    _context.BookLikes.Any(l => l.BookId == x.Id && l.UserId == request.RequestingUserId),
                 MovieAdaptations = x.MovieAdaptations
                     .Where(m => !m.IsDeleted)
                     .Select(m => new MovieAdaptationDto
@@ -47,5 +50,18 @@ public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDto
                     .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (book is null)
+            return null;
+
+        if (!string.IsNullOrEmpty(request.RequestingUserId))
+        {
+            book.MyReadingProgress = await _context.ReadingProgresses
+                .Where(p => p.UserId == request.RequestingUserId && p.BookId == request.Id)
+                .Select(p => (int?)p.PercentageComplete)
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        return book;
     }
 }

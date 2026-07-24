@@ -5,8 +5,11 @@ using WebApi.Application.Features.MovieCollections.Commands.AddMovieToCollection
 using WebApi.Application.Features.MovieCollections.Commands.CreateMovieCollection;
 using WebApi.Application.Features.MovieCollections.Commands.DeleteMovieCollection;
 using WebApi.Application.Features.MovieCollections.Commands.RemoveMovieFromCollection;
+using WebApi.Application.Features.MovieCollections.Commands.ToggleCollectionLike;
+using WebApi.Application.Features.MovieCollections.Commands.ToggleSaveCollection;
 using WebApi.Application.Features.MovieCollections.Commands.UpdateMovieCollection;
 using WebApi.Application.Features.MovieCollections.Queries.GetMovieCollectionById;
+using WebApi.Application.Features.MovieCollections.Queries.GetSavedMovieCollections;
 using WebApi.Application.Features.MovieCollections.Queries.GetUserMovieCollections;
 using WebApi.Application.Interfaces;
 
@@ -99,5 +102,39 @@ public class MovieCollectionsController : ControllerBase
             return NotFound();
 
         return Ok(collection);
+    }
+    
+    [Authorize]
+    [HttpPost("{id}/save")]
+    public async Task<IActionResult> ToggleSave(Guid id)
+    {
+        var isSaved = await _mediator.Send(new ToggleSaveCollectionCommand
+        {
+            MovieCollectionId = id,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { IsSaved = isSaved });
+    }
+
+    [Authorize]
+    [HttpGet("saved")]
+    public async Task<IActionResult> GetSaved()
+    {
+        var collections = await _mediator.Send(new GetSavedMovieCollectionsQuery(_currentUserService.UserId));
+        return Ok(collections);
+    }
+    
+    [Authorize]
+    [HttpPost("{id}/like")]
+    public async Task<IActionResult> ToggleLike(Guid id)
+    {
+        var isLiked = await _mediator.Send(new ToggleMovieCollectionLikeCommand
+        {
+            MovieCollectionId = id,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { IsLiked = isLiked });
     }
 }

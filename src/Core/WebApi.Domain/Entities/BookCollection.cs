@@ -14,4 +14,6 @@ public class BookCollection : BaseEntity
 
     // Kolleksiyadakı kitablar
     public virtual ICollection<BookCollectionItem> BookItems { get; set; } = new List<BookCollectionItem>();
+    public virtual ICollection<BookCollectionLike> Likes { get; set; } = new List<BookCollectionLike>();
+    
 }

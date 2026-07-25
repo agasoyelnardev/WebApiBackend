@@ -16,6 +16,7 @@ public class Movie : BaseEntity
     public string TrailerUrl { get; set; } = string.Empty;
     public string? VideoUrl { get; set; }
     public int Likes { get; set; }
+    public string? ExternalUrl { get; set; }
     
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();

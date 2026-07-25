@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Books.Commands.CreateBook;
 using WebApi.Application.Features.Books.Commands.DeleteBook;
+using WebApi.Application.Features.Books.Commands.ImportBookFromGoogleBooks;
 using WebApi.Application.Features.Books.Commands.UpdateBook;
 using WebApi.Application.Features.Books.Queries.GetBookById;
 using WebApi.Application.Features.Books.Queries.GetFilteredBooks;
+using WebApi.Application.Features.Books.Queries.SearchGoogleBooks;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
@@ -64,5 +66,21 @@ public class BooksController : ControllerBase
     {
         await _mediator.Send(new DeleteBookCommand(id));
         return NoContent();
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("googlebooks/search")]
+    public async Task<IActionResult> SearchGoogleBooks([FromQuery] string query)
+    {
+        var results = await _mediator.Send(new SearchGoogleBooksQuery(query));
+        return Ok(results);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("googlebooks/import/{googleBooksId}")]
+    public async Task<IActionResult> ImportFromGoogleBooks(string googleBooksId)
+    {
+        var bookId = await _mediator.Send(new ImportBookFromGoogleBooksCommand { GoogleBooksId = googleBooksId });
+        return Ok(bookId);
     }
 }

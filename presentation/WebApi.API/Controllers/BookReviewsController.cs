@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.BookReviews.Commands.CreateBookReview;
 using WebApi.Application.Features.BookReviews.Commands.DeleteBookReview;
+using WebApi.Application.Features.BookReviews.Commands.ToggleBookReviewLike;
 using WebApi.Application.Features.BookReviews.Commands.UpdateBookReview;
 using WebApi.Application.Features.BookReviews.Queries.GetBookReviewsByBookId;
 using WebApi.Application.Interfaces;
+using WebApi.Domain.Entities;
+using WebApi.Domain.Enums;
 
 namespace WebApi.API.Controllers;
 
@@ -60,5 +63,33 @@ public class BookReviewsController : ControllerBase
     {
         var reviews = await _mediator.Send(new GetBookReviewsByBookIdQuery(bookId));
         return Ok(reviews);
+    }
+
+    [Authorize]
+    [HttpPost("{id}/like")]
+    public async Task<IActionResult> Like(Guid id)
+    {
+        var result = await _mediator.Send(new ToggleBookReviewLikeCommand
+        {
+            BookReviewId = id,
+            Choice = ReviewLikeChoice.Like,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { Active = result });
+    }
+
+    [Authorize]
+    [HttpPost("{id}/dislike")]
+    public async Task<IActionResult> Dislike(Guid id)
+    {
+        var result = await _mediator.Send(new ToggleBookReviewLikeCommand
+        {
+            BookReviewId = id,
+            Choice = ReviewLikeChoice.Dislike,
+            UserId = _currentUserService.UserId
+        });
+
+        return Ok(new { Active = result });
     }
 }

@@ -6,9 +6,9 @@ using WebApi.Application.Features.Reviews.Commands.DeleteReview;
 using WebApi.Application.Features.Reviews.Commands.ToggleReviewLike;
 using WebApi.Application.Features.Reviews.Commands.UpdateReview;
 using WebApi.Application.Features.Reviews.Queries.GetReviewsByMovieId;
+using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 using WebApi.Domain.Enums;
-using WebApi.Persistence.Service;
 
 namespace WebApi.API.Controllers;
 
@@ -17,9 +17,9 @@ namespace WebApi.API.Controllers;
 public class ReviewsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly CurrentUserService _currentUserService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ReviewsController(IMediator mediator,CurrentUserService currentUserService)
+    public ReviewsController(IMediator mediator, ICurrentUserService currentUserService)
     {
         _mediator = mediator;
         _currentUserService = currentUserService;
@@ -33,7 +33,7 @@ public class ReviewsController : ControllerBase
 
         return Ok(reviewId);
     }
-    
+
     [HttpGet("movie/{movieId}")]
     public async Task<IActionResult> GetByMovieId(Guid movieId)
     {
@@ -45,7 +45,7 @@ public class ReviewsController : ControllerBase
 
         return Ok(result);
     }
-    
+
     [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
@@ -54,7 +54,7 @@ public class ReviewsController : ControllerBase
 
         return NoContent();
     }
-    
+
     [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
@@ -67,20 +67,7 @@ public class ReviewsController : ControllerBase
 
         return NoContent();
     }
-    
-    [Authorize]
-    [HttpPost("{id}/like")]
-    public async Task<IActionResult> ToggleLike(Guid id)
-    {
-        var isLiked = await _mediator.Send(new ToggleReviewLikeCommand
-        {
-            ReviewId = id,
-            UserId = _currentUserService.UserId
-        });
 
-        return Ok(new { IsLiked = isLiked });
-    }
-    
     [Authorize]
     [HttpPost("{id}/like")]
     public async Task<IActionResult> Like(Guid id)

@@ -14,6 +14,7 @@ public class CreateMovieCommand : IRequest<Guid>
     public string Director { get; set; } = string.Empty;
     public string TrailerUrl { get; set; } = string.Empty;
     public string? VideoUrl { get; set; }
+    public string? ExternalUrl { get; set; }
 
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();

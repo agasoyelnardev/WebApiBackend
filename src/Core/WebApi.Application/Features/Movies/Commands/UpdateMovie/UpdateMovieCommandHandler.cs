@@ -60,8 +60,9 @@ public class UpdateMovieCommandHandler
         movie.VideoUrl = request.VideoUrl;
         movie.Genres = request.Genres;
         movie.Cast = request.Cast;
-        movie.BookSourceId = request.BookSourceId;   // ← YENİ
+        movie.BookSourceId = request.BookSourceId; 
         movie.UpdatedAt = DateTime.UtcNow;
+        movie.ExternalUrl = request.ExternalUrl;
 
         await _context.SaveChangesAsync(cancellationToken);
 

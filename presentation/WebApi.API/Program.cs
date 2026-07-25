@@ -13,6 +13,7 @@ using WebApi.Infrastructure.Persistence.Services;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
 using WebApi.Persistence.Service;
+using WebApi.Persistence.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
@@ -22,6 +23,8 @@ builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IRoomPresenceService, RoomPresenceService>();
 builder.Services.AddScoped<IPointsService, PointsService>();
+builder.Services.AddHttpClient<IMovieImportService, TmdbMovieImportService>();
+builder.Services.AddHttpClient<IBookImportService, GoogleBooksImportService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

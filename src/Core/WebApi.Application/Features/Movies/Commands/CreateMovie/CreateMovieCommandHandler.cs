@@ -56,7 +56,8 @@ public class CreateMovieCommandHandler
             VideoUrl = request.VideoUrl,
             Genres = request.Genres,
             Cast = request.Cast,
-            BookSourceId = request.BookSourceId
+            BookSourceId = request.BookSourceId,
+            ExternalUrl = request.ExternalUrl,
         };
 
         await _context.Movies.AddAsync(movie, cancellationToken);

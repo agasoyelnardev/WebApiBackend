@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Movies.Commands.CreateMovie;
 using WebApi.Application.Features.Movies.Commands.DeleteMovie;
+using WebApi.Application.Features.Movies.Commands.ImportMovieFromTmdb;
 using WebApi.Application.Features.Movies.Commands.UpdateMovie;
 using WebApi.Application.Features.Movies.Queries.GetFilteredMovies;
 using WebApi.Application.Features.Movies.Queries.GetMovieById;
+using WebApi.Application.Features.Movies.Queries.SearchTmdbMovies;
 using WebApi.Domain.Entities;
 using WebApi.Persistence.Service;
 
@@ -66,5 +68,21 @@ public class MoviesController : ControllerBase
     {
         await _mediator.Send(new DeleteMovieCommand(id));
         return NoContent();
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("tmdb/search")]
+    public async Task<IActionResult> SearchTmdb([FromQuery] string query)
+    {
+        var results = await _mediator.Send(new SearchTmdbMoviesQuery(query));
+        return Ok(results);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("tmdb/import/{tmdbId}")]
+    public async Task<IActionResult> ImportFromTmdb(int tmdbId)
+    {
+        var movieId = await _mediator.Send(new ImportMovieFromTmdbCommand { TmdbId = tmdbId });
+        return Ok(movieId);
     }
 }

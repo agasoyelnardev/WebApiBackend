@@ -17,7 +17,8 @@ public class MovieDto
     public string? VideoUrl { get; set; }
     public List<string> Genres { get; set; } = new();
     public List<string> Cast { get; set; } = new();
-    public int Likes { get; set; }                        
+    public int Likes { get; set; }                 
+    public string? ExternalUrl { get; set; }
     public bool IsLikedByCurrentUser { get; set; }       
 
     public BookSourceDto? BookSource { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.ReadingProgress.Commands.UpdateReadingProgress;
 using WebApi.Application.Features.ReadingProgress.Queries.GetAllReadingProgress;
+using WebApi.Application.Features.ReadingProgress.Queries.GetReadingHistory;
 using WebApi.Application.Features.ReadingProgress.Queries.GetReadingProgress;
 using WebApi.Application.Interfaces;
 
@@ -52,5 +53,12 @@ public class ReadingProgressController : ControllerBase
     {
         var progress = await _mediator.Send(new GetAllReadingProgressQuery(_currentUserService.UserId));
         return Ok(progress);
+    }
+    
+    [HttpGet("history")]
+    public async Task<IActionResult> GetHistory()
+    {
+        var history = await _mediator.Send(new GetReadingHistoryQuery(_currentUserService.UserId));
+        return Ok(history);
     }
 }

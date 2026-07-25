@@ -5,6 +5,7 @@ using WebApi.Application.Features.Movies.Commands.CreateMovie;
 using WebApi.Application.Features.Movies.Commands.DeleteMovie;
 using WebApi.Application.Features.Movies.Commands.ImportMovieFromTmdb;
 using WebApi.Application.Features.Movies.Commands.UpdateMovie;
+using WebApi.Application.Features.Movies.Dtos;
 using WebApi.Application.Features.Movies.Queries.GetFilteredMovies;
 using WebApi.Application.Features.Movies.Queries.GetMovieById;
 using WebApi.Application.Features.Movies.Queries.SearchTmdbMovies;

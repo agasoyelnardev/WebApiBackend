@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using WebApi.Application.Features.Movies.Queries.GetMovieById;
+using WebApi.Application.Features.Movies.Dtos;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 

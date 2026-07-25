@@ -6,6 +6,7 @@ using WebApi.Application.Features.BookLists.Commands.ToggleBookLike;
 using WebApi.Application.Features.BookLists.Commands.ToggleBookWatchlist;
 using WebApi.Application.Features.BookLists.Queries.GetUserBookFavorites;
 using WebApi.Application.Features.BookLists.Queries.GetUserBookWatchlist;
+using WebApi.Application.Features.MovieLists.Queries.GetWatchHistory;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
@@ -72,5 +73,13 @@ public class BookListsController : ControllerBase
     {
         var books = await _mediator.Send(new GetUserBookWatchlistQuery(_currentUserService.UserId));
         return Ok(books);
+    }
+    
+    [Authorize]
+    [HttpGet("history")]
+    public async Task<IActionResult> GetWatchHistory()
+    {
+        var movies = await _mediator.Send(new GetWatchHistoryQuery(_currentUserService.UserId));
+        return Ok(movies);
     }
 }

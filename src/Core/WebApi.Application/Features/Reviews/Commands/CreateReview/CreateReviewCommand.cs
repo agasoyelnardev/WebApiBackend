@@ -10,4 +10,5 @@ public class CreateReviewCommand : IRequest<Guid>
     public double Rating { get; set; }
 
     public Guid MovieId { get; set; }
+    public string UserId { get; set; } = string.Empty; 
 }

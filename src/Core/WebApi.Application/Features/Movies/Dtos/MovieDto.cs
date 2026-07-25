@@ -1,4 +1,6 @@
-namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
+using WebApi.Application.Features.Movies.Queries.GetMovieById;
+
+namespace WebApi.Application.Features.Movies.Dtos;
 
 
 public class MovieDto

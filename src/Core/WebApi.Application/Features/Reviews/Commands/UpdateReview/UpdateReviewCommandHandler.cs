@@ -49,9 +49,9 @@ public class UpdateReviewCommandHandler : IRequestHandler<UpdateReviewCommand>
 
         review.Content = request.Content.Trim();
         review.Rating = request.Rating;
-        
-        await _publisher.Publish(new MovieRatingChangedEvent(review.MovieId), cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);   
+
+        await _publisher.Publish(new MovieRatingChangedEvent(review.MovieId), cancellationToken);   
     }
 }

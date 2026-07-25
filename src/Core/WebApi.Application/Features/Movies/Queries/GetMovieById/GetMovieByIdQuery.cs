@@ -1,4 +1,5 @@
 using MediatR;
+using WebApi.Application.Features.Movies.Dtos;
 
 namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
 

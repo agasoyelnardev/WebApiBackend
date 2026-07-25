@@ -25,14 +25,7 @@ public class ReviewsController : ControllerBase
         _currentUserService = currentUserService;
     }
 
-    [Authorize]
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateReviewCommand command)
-    {
-        var reviewId = await _mediator.Send(command);
 
-        return Ok(reviewId);
-    }
 
     [HttpGet("movie/{movieId}")]
     public async Task<IActionResult> GetByMovieId(Guid movieId)
@@ -47,24 +40,32 @@ public class ReviewsController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateReviewCommand command)
+    {
+        command.UserId = _currentUserService.UserId;
+        var reviewId = await _mediator.Send(command);
+        return Ok(reviewId);
+    }
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteReviewCommand(id));
-
+        await _mediator.Send(new DeleteReviewCommand(id)
+        {
+            RequestedByUserId = _currentUserService.UserId
+        });
         return NoContent();
     }
 
     [Authorize]
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(
-        Guid id,
-        UpdateReviewCommand command)
+    public async Task<IActionResult> Update(Guid id, UpdateReviewCommand command)
     {
         command.Id = id;
-
+        command.RequestedByUserId = _currentUserService.UserId;
         await _mediator.Send(command);
-
         return NoContent();
     }
 

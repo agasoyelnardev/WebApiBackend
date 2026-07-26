@@ -10,9 +10,9 @@ namespace WebApi.API.Controllers;
 public class StatsController : ControllerBase
 {
     private readonly IOnlineUsersTracker _onlineUsersTracker;
-    private readonly Mediator _mediator;
+    private readonly IMediator _mediator;
 
-    public StatsController(IOnlineUsersTracker onlineUsersTracker,Mediator mediator)
+    public StatsController(IOnlineUsersTracker onlineUsersTracker, IMediator mediator)
     {
         _onlineUsersTracker = onlineUsersTracker;
         _mediator = mediator;

@@ -75,11 +75,4 @@ public class BookListsController : ControllerBase
         return Ok(books);
     }
     
-    [Authorize]
-    [HttpGet("history")]
-    public async Task<IActionResult> GetWatchHistory()
-    {
-        var movies = await _mediator.Send(new GetWatchHistoryQuery(_currentUserService.UserId));
-        return Ok(movies);
-    }
 }

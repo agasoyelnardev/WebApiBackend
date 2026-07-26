@@ -9,8 +9,7 @@ using WebApi.Application.Features.Movies.Dtos;
 using WebApi.Application.Features.Movies.Queries.GetFilteredMovies;
 using WebApi.Application.Features.Movies.Queries.GetMovieById;
 using WebApi.Application.Features.Movies.Queries.SearchTmdbMovies;
-using WebApi.Domain.Entities;
-using WebApi.Persistence.Service;
+using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;
 
@@ -19,9 +18,9 @@ namespace WebApi.API.Controllers;
 public class MoviesController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly CurrentUserService _currentUserService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public MoviesController(IMediator mediator,CurrentUserService currentUserService)
+    public MoviesController(IMediator mediator, ICurrentUserService currentUserService)
     {
         _mediator = mediator;
         _currentUserService = currentUserService;

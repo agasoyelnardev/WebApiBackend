@@ -26,6 +26,7 @@ builder.Services.AddScoped<IPointsService, PointsService>();
 builder.Services.AddHttpClient<IMovieImportService, TmdbMovieImportService>();
 builder.Services.AddHttpClient<IBookImportService, GoogleBooksImportService>();
 builder.Services.AddHttpClient<IAiChatService, GeminiChatService>();
+builder.Services.AddSingleton<IOnlineUsersTracker, OnlineUsersTracker>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

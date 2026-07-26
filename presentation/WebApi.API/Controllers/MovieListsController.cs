@@ -6,6 +6,7 @@ using WebApi.Application.Features.MovieLists.Commands.ToggleFavorite;
 using WebApi.Application.Features.MovieLists.Commands.ToggleMovieLike;
 using WebApi.Application.Features.MovieLists.Commands.ToggleWatchlist;
 using WebApi.Application.Features.MovieLists.Queries.GetUserMovieList;
+using WebApi.Application.Features.MovieLists.Queries.GetWatchHistory;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
@@ -72,7 +73,7 @@ public class MovieListsController : ControllerBase
 
         return Ok(movies);
     }
-    
+
     [HttpPost("likes/{movieId}/toggle")]
     public async Task<IActionResult> ToggleLike(Guid movieId)
     {
@@ -84,8 +85,7 @@ public class MovieListsController : ControllerBase
 
         return Ok(new { IsLiked = isLiked });
     }
-    
-    [Authorize]
+
     [HttpPost("start-watching/{movieId}")]
     public async Task<IActionResult> StartWatching(Guid movieId)
     {
@@ -96,5 +96,12 @@ public class MovieListsController : ControllerBase
         });
 
         return Ok(new { Message = "İzləməyə başladınız" });
+    }
+
+    [HttpGet("history")]
+    public async Task<IActionResult> GetWatchHistory()
+    {
+        var movies = await _mediator.Send(new GetWatchHistoryQuery(_currentUserService.UserId));
+        return Ok(movies);
     }
 }

@@ -27,7 +27,10 @@ public class SubscribeToPremiumCommandHandler : IRequestHandler<SubscribeToPremi
 
         if (user is null)
             throw new NotFoundException("İstifadəçi tapılmadı.");
-
+        
+        if (!user.PremiumEndDate.HasValue || user.PremiumEndDate.Value <= DateTime.UtcNow)
+            user.PremiumStartDate = DateTime.UtcNow;  
+        
         var duration = request.Plan == PremiumPlan.Monthly
             ? TimeSpan.FromDays(30)
             : TimeSpan.FromDays(365);
@@ -38,6 +41,7 @@ public class SubscribeToPremiumCommandHandler : IRequestHandler<SubscribeToPremi
             : DateTime.UtcNow;
 
         user.PremiumEndDate = baseDate.Add(duration);
+        user.LastPremiumPlan = request.Plan.ToString();
 
         await _context.SaveChangesAsync(cancellationToken);
 

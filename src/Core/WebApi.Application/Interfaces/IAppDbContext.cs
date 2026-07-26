@@ -14,6 +14,7 @@ public interface IAppDbContext
     DbSet<RefreshToken> RefreshTokens { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     DbSet<Book> Books { get; }
+    DbSet<StreamRoom> StreamRooms { get; }
     DbSet<BookReview> BookReviews { get; }
     DbSet<BookCollection> BookCollections { get; }
     DbSet<BookCollectionItem> BookCollectionItems { get; }

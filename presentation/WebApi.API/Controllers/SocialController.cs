@@ -10,6 +10,7 @@ using WebApi.Application.Features.Social.Commands.UnfollowUser;
 using WebApi.Application.Features.Social.Queries.GetFollowers;
 using WebApi.Application.Features.Social.Queries.GetFollowing;
 using WebApi.Application.Features.Social.Queries.GetPendingFriendRequests;
+using WebApi.Application.Features.Social.Queries.GetRecentActivities;
 using WebApi.Application.Features.Social.Query.GetFriends;
 using WebApi.Application.Interfaces;
 
@@ -153,5 +154,12 @@ public class SocialController : ControllerBase
             });
 
         return Ok(new { Message = "Dostluq silindi" });
+    }
+    
+    [HttpGet("activity-stream")]
+    public async Task<IActionResult> GetActivityStream([FromQuery] int hours = 2)
+    {
+        var activities = await _mediator.Send(new GetRecentActivitiesQuery(hours));
+        return Ok(activities);
     }
 }

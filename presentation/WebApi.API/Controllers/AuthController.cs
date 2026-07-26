@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using WebApi.Application.Features.Auth.Commands.ChangePassword;
 using WebApi.Application.Features.Auth.Commands.Login;
 using WebApi.Application.Features.Auth.Commands.Register;
 using WebApi.Application.Features.Auth.Commands.RefreshToken;
@@ -61,5 +62,14 @@ public class AuthController : ControllerBase
     {
         var result = await _mediator.Send(new GetCurrentUserQuery(_currentUserService.UserId));
         return Ok(result);
+    }
+    
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordCommand command)
+    {
+        command.UserId = _currentUserService.UserId;
+        await _mediator.Send(command);
+        return Ok(new { Message = "Şifrə uğurla dəyişdirildi." });
     }
 }

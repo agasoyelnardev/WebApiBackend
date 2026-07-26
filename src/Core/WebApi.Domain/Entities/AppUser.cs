@@ -14,10 +14,14 @@ public class AppUser : IdentityUser
     
     public DateTime? PremiumEndDate { get; set; }
     public bool IsPremium => PremiumEndDate.HasValue && PremiumEndDate.Value > DateTime.UtcNow;
+    public string? LastPremiumPlan { get; set; }
+    public DateTime? PremiumStartDate { get; set; }
     
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    
+    
     
     //Follow
     public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();

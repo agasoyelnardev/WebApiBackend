@@ -14,6 +14,7 @@ public class Book : BaseEntity
     public int Pages { get; set; }
     public int Likes { get; set; }
 
+    public string Genres { get; set; } = string.Empty;
     public string? DownloadUrl { get; set; }
     public string? PdfUrl { get; set; }
     public string? CustomContent { get; set; }

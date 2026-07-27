@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.Infrastructure.Persistence.Services;
+namespace WebApi.Persistence.Services;
 
 public class PointsService : IPointsService
 {

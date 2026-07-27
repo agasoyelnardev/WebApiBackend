@@ -9,11 +9,10 @@ using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Interfaces;
 using WebApi.Application.Services;
 using WebApi.Domain.Entities;
-using WebApi.Infrastructure.Persistence.Services;
+using WebApi.Persistence.Services;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
 using WebApi.Persistence.Service;
-using WebApi.Persistence.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();

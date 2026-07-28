@@ -21,4 +21,5 @@ public class BookDto
     public int? MyReadingProgress { get; set; }
     public int Likes { get; set; }                    
     public bool IsLikedByCurrentUser { get; set; }
+    public List<string> Genres { get; set; } = new();  
 }

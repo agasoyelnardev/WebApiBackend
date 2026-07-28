@@ -11,6 +11,10 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         builder.Property(x => x.FullName)
             .HasMaxLength(100);
 
+        builder.Property(x => x.FullName)
+            .IsRequired()
+            .HasMaxLength(100);
+        
         builder.Property(x => x.Avatar)
             .HasMaxLength(500);
 

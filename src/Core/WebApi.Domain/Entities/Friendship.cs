@@ -1,6 +1,7 @@
-using WebApi.Domain.Entities;
 using WebApi.Domain.Entities.Base;
-using WebApi.Domain.Enum;
+using WebApi.Domain.Enums;
+
+namespace WebApi.Domain.Entities;
 
 public class Friendship:BaseEntity
 {
@@ -12,6 +13,4 @@ public class Friendship:BaseEntity
     public AppUser Receiver { get; set; } = null!;
 
     public FriendshipStatus Status { get; set; } = FriendshipStatus.Pending;
-
-
 }

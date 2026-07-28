@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Enum;
+using WebApi.Domain.Enums;
 
 namespace WebApi.Application.Features.Social.Query.GetFriends;
 

@@ -2,32 +2,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WebApi.Domain.Entities;
 
-namespace WebApi.Infrastructure.Persistence.Configurations;
+namespace WebApi.Persistence.Configurations;
 
 public class DiscussionConfiguration : IEntityTypeConfiguration<Discussion>
 {
     public void Configure(EntityTypeBuilder<Discussion> builder)
     {
-        builder.HasKey(d => d.Id);
-
-        builder.Property(d => d.Title)
+        builder.Property(x => x.Title)
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(d => d.Content)
+        builder.Property(x => x.Content)
             .IsRequired()
-            .HasMaxLength(5000);
+            .HasMaxLength(4000);
 
-        // Enum dəyərini bazada rəqəm deyil, oxunaqlı string (məs. "Reviews") kimi saxlamaq üçün:
-        builder.Property(d => d.Category)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasMaxLength(50);
+        builder.HasOne(x => x.Author)
+            .WithMany()
+            .HasForeignKey(x => x.AuthorId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // Author (AppUser) ilə əlaqə
-        builder.HasOne(d => d.Author)
-            .WithMany() 
-            .HasForeignKey(d => d.AuthorId)
-            .OnDelete(DeleteBehavior.Restrict); // İstifadəçi silindikdə onun bütün postları birdən-birə silinməsin (Restrict)
+        builder.HasMany(x => x.Comments)
+            .WithOne(x => x.Discussion)
+            .HasForeignKey(x => x.DiscussionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Likes)
+            .WithOne(x => x.Discussion)
+            .HasForeignKey(x => x.DiscussionId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

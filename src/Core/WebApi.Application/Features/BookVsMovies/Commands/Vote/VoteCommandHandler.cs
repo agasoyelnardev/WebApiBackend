@@ -9,15 +9,18 @@ namespace WebApi.Application.Features.BookVsMovies.Commands.Vote;
 public class VoteCommandHandler : IRequestHandler<VoteCommand>
 {
     private readonly IAppDbContext _context;
-
-    public VoteCommandHandler(IAppDbContext context)
+    private readonly ICurrentUserService _currentUserService;
+    public VoteCommandHandler(IAppDbContext context,ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService=currentUserService;
     }
 
     public async Task Handle(VoteCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var userId = _currentUserService.UserId;
+        
+        if (string.IsNullOrEmpty(userId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var comparison = await _context.BookVsMovies
@@ -30,7 +33,7 @@ public class VoteCommandHandler : IRequestHandler<VoteCommand>
             .FirstOrDefaultAsync(
                 v => v.BookVsMovieId == request.BookVsMovieId && v.UserId == request.UserId,
                 cancellationToken);
-
+        
         if (existingVote is null)
         {
             // Yeni səs

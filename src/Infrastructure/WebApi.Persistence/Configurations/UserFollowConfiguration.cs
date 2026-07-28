@@ -8,6 +8,9 @@ public class UserFollowConfiguration : IEntityTypeConfiguration<UserFollow>
 {
     public void Configure(EntityTypeBuilder<UserFollow> builder)
     {
+        builder.HasIndex(x => new { x.FollowerId, x.FollowingId })
+            .IsUnique();
+
         builder.HasOne(x => x.Follower)
             .WithMany(x => x.Following)
             .HasForeignKey(x => x.FollowerId)

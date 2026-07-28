@@ -16,4 +16,6 @@ public class BookReview : BaseEntity
     public string Comment { get; set; } = string.Empty;
     public int Likes { get; set; }
     public int Dislikes { get; set; }
+    
+    public virtual ICollection<BookReviewLike> ReviewLikes { get; set; } = new List<BookReviewLike>();
 }

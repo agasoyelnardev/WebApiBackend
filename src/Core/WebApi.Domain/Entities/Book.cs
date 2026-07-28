@@ -13,8 +13,7 @@ public class Book : BaseEntity
     public int Year { get; set; }
     public int Pages { get; set; }
     public int Likes { get; set; }
-
-    public string Genres { get; set; } = string.Empty;
+    public List<string> Genres { get; set; } = new();
     public string? DownloadUrl { get; set; }
     public string? PdfUrl { get; set; }
     public string? CustomContent { get; set; }

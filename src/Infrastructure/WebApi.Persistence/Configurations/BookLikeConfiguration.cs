@@ -10,5 +10,15 @@ public class BookLikeConfiguration : IEntityTypeConfiguration<BookLike>
     {
         builder.HasIndex(x => new { x.UserId, x.BookId })
             .IsUnique();
+
+        builder.HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Book)
+            .WithMany()
+            .HasForeignKey(x => x.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -17,5 +17,6 @@ public class Review : BaseEntity
     public AppUser User { get; set; } = null!;
 
     public int Likes { get; set; }
-    public int Dislikes { get; set; }  
+    public int Dislikes { get; set; }
+    public virtual ICollection<ReviewLike> ReviewLikes { get; set; } = new List<ReviewLike>();
 }

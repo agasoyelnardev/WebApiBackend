@@ -10,5 +10,15 @@ public class MovieLikeConfiguration : IEntityTypeConfiguration<MovieLike>
     {
         builder.HasIndex(x => new { x.UserId, x.MovieId })
             .IsUnique();
+
+        builder.HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.Movie)
+            .WithMany()
+            .HasForeignKey(x => x.MovieId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

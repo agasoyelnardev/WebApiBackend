@@ -12,7 +12,7 @@ public class StreamRoom : BaseEntity
     public int ViewerCount { get; set; } = 0;
     public string CoverImageUrl { get; set; } = string.Empty;
     
-    public string CreatedByUserId { get; set; }
+    public string CreatedByUserId { get; set; } = string.Empty;
     public AppUser CreatedByUser { get; set; } = null!;
     
     public Guid? MovieId { get; set; }

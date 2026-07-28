@@ -52,6 +52,7 @@ public class UpdateBookCommandHandler : IRequestHandler<UpdateBookCommand, bool>
         book.IsTrending = request.IsTrending;
         book.IsTopRated = request.IsTopRated;
         book.IsNewRelease = request.IsNewRelease;
+        book.Genres = request.Genres;
         
         book.UpdatedAt = DateTime.UtcNow;
 

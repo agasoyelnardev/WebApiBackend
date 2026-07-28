@@ -43,11 +43,12 @@ public class GetBookVsMovieByIdQueryHandler
         if (!string.IsNullOrEmpty(request.RequestingUserId))
         {
             var myVote = await _context.BookVsMovieVotes
-                .Where(v => v.BookVsMovieId == request.Id && v.UserId == request.RequestingUserId)
+                .Where(v => v.BookVsMovieId == request.Id &&
+                            v.UserId == request.RequestingUserId)
                 .Select(v => (VoteChoice?)v.Choice)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            comparison.MyVote = myVote?.ToString();
+            comparison.MyVote = myVote;
         }
 
         return comparison;

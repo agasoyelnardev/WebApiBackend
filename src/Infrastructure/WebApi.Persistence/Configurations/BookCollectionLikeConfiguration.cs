@@ -12,12 +12,7 @@ public class BookCollectionLikeConfiguration
         builder.HasOne(x => x.User)
             .WithMany()
             .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.BookCollection)
-            .WithMany()
-            .HasForeignKey(x => x.BookCollectionId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);  
 
         builder.HasIndex(x => new
         {

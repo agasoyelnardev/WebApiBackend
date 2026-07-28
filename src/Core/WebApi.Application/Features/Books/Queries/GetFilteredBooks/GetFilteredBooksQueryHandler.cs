@@ -60,6 +60,11 @@ public class GetFilteredBooksQueryHandler : IRequestHandler<GetFilteredBooksQuer
         {
             query = query.Where(b => b.IsNewRelease == request.IsNewRelease);
         }
+        
+        if (!string.IsNullOrWhiteSpace(request.Genre))
+        {
+            query = query.Where(b => b.Genres.Contains(request.Genre));
+        }
 
         query = request.SortBy switch
         {
@@ -89,7 +94,8 @@ public class GetFilteredBooksQueryHandler : IRequestHandler<GetFilteredBooksQuer
                 IsTrending = b.IsTrending,
                 IsTopRated = b.IsTopRated,
                 IsNewRelease = b.IsNewRelease,
-                Likes = b.Likes
+                Likes = b.Likes,
+                Genres = b.Genres,
             })
             .ToListAsync(cancellationToken);
     }

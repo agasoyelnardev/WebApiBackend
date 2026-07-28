@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Enum;
+using WebApi.Domain.Enums;
 
 namespace WebApi.Application.Features.Social.Commands.DeclineFriendRequest;
 

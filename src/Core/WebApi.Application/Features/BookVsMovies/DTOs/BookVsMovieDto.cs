@@ -1,3 +1,5 @@
+using WebApi.Domain.Entities;
+
 namespace WebApi.Application.Features.BookVsMovies.Dtos;
 
 public class BookVsMovieDto
@@ -18,5 +20,5 @@ public class BookVsMovieDto
     public int MovieVotes { get; set; }
 
     // Sorğunu göndərən istifadəçinin öz səsi (varsa)
-    public string? MyVote { get; set; } // "Book", "Movie" və ya null
+    public VoteChoice? MyVote { get; set; } // "Book", "Movie" və ya null
 }

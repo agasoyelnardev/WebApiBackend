@@ -12,4 +12,5 @@ public class ReadingProgress : BaseEntity
 
     // 0-100 arası faiz
     public int PercentageComplete { get; set; }
+    public int CurrentPage { get; set; }
 }

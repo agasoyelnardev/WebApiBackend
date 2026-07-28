@@ -35,6 +35,7 @@ public class GetBookByIdQueryHandler : IRequestHandler<GetBookByIdQuery, BookDto
                 IsTrending = x.IsTrending,
                 IsTopRated = x.IsTopRated,
                 IsNewRelease = x.IsNewRelease,
+                Genres = x.Genres,
                 Likes = x.Likes,
                 IsLikedByCurrentUser = request.RequestingUserId != null &&
                     _context.BookLikes.Any(l => l.BookId == x.Id && l.UserId == request.RequestingUserId),

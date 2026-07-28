@@ -4,8 +4,7 @@ using WebApi.Domain.Entities;
 
 namespace WebApi.Persistence.Configurations;
 
-public class MovieCollectionLikeConfiguration
-    : IEntityTypeConfiguration<MovieCollectionLike>
+public class MovieCollectionLikeConfiguration : IEntityTypeConfiguration<MovieCollectionLike>
 {
     public void Configure(EntityTypeBuilder<MovieCollectionLike> builder)
     {
@@ -15,11 +14,7 @@ public class MovieCollectionLikeConfiguration
         builder.HasOne(x => x.User)
             .WithMany()
             .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.MovieCollection)
-            .WithMany(x => x.Likes)
-            .HasForeignKey(x => x.MovieCollectionId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.NoAction); 
+        
     }
 }

@@ -18,4 +18,5 @@ public class UpdateBookCommand : IRequest<bool>
     public bool IsTrending { get; set; }
     public bool IsTopRated { get; set; }
     public bool IsNewRelease { get; set; }
+    public List<string> Genres { get; set; } = new(); 
 }

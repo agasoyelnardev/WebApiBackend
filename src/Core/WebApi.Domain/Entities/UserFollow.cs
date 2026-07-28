@@ -1,5 +1,6 @@
-using WebApi.Domain.Entities;
 using WebApi.Domain.Entities.Base;
+
+namespace WebApi.Domain.Entities;
 
 public class UserFollow:BaseEntity
 {

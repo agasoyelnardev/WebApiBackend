@@ -17,4 +17,5 @@ public class CreateBookCommand : IRequest<Guid>
     public bool IsTrending { get; set; }
     public bool IsTopRated { get; set; }
     public bool IsNewRelease { get; set; }
+    public List<string> Genres { get; set; } = new();
 }

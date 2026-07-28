@@ -2,23 +2,19 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WebApi.Domain.Entities;
 
-public class BookVsMovieVoteConfiguration
-    : IEntityTypeConfiguration<BookVsMovieVote>
+namespace WebApi.Persistence.Configurations;
+
+public class BookVsMovieVoteConfiguration : IEntityTypeConfiguration<BookVsMovieVote>
 {
     public void Configure(EntityTypeBuilder<BookVsMovieVote> builder)
     {
-        builder.HasOne(x => x.BookVsMovie)
-            .WithMany(x => x.Votes)
-            .HasForeignKey(x => x.BookVsMovieId);
+        // Bir istifadəçi eyni Book vs Movie üçün yalnız 1 dəfə səs verə bilsin
+        builder.HasIndex(x => new { x.UserId, x.BookVsMovieId })
+            .IsUnique();
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.BookVsMovieVotes)
-            .HasForeignKey(x => x.UserId);
-
-        builder.HasIndex(x => new
-        {
-            x.BookVsMovieId,
-            x.UserId
-        }).IsUnique();
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

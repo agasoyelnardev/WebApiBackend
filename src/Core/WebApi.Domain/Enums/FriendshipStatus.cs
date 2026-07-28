@@ -1,4 +1,4 @@
-namespace WebApi.Domain.Enum;
+namespace WebApi.Domain.Enums;
 public enum FriendshipStatus
 {
     Pending,

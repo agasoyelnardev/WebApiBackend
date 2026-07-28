@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Interfaces;
+using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Social.Commands.FollowUser;
 

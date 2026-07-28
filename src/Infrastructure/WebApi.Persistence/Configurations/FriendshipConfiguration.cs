@@ -8,6 +8,9 @@ public class FriendshipConfiguration : IEntityTypeConfiguration<Friendship>
 {
     public void Configure(EntityTypeBuilder<Friendship> builder)
     {
+        builder.HasIndex(x => new { x.SenderId, x.ReceiverId })
+            .IsUnique();
+
         builder.HasOne(x => x.Sender)
             .WithMany(x => x.SentFriendRequests)
             .HasForeignKey(x => x.SenderId)

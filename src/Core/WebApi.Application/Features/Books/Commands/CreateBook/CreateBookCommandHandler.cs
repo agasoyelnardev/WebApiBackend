@@ -53,7 +53,8 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Guid>
             CustomContent = request.CustomContent,
             IsTrending = request.IsTrending,
             IsTopRated = request.IsTopRated,
-            IsNewRelease = request.IsNewRelease
+            IsNewRelease = request.IsNewRelease,
+            Genres = request.Genres,
         };
 
         await _context.Books.AddAsync(book, cancellationToken);

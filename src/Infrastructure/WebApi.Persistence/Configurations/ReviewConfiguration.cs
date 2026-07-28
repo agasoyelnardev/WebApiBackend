@@ -8,27 +8,26 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
 {
     public void Configure(EntityTypeBuilder<Review> builder)
     {
-        builder.HasKey(r => r.Id);
-
-        builder.Property(r => r.UserId)
-            .IsRequired();
-
-        builder.Property(r => r.Content)
+        builder.Property(x => x.Content)
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.Property(r => r.Rating)
-            .IsRequired();
+        builder.HasIndex(x => new { x.UserId, x.MovieId })
+            .IsUnique();
 
-        // One-to-Many əlaqəsi (Bir filmin çoxlu rəyi, hər rəyin isə yalnız bir filmi ola bilər)
-        builder.HasOne(r => r.Movie)
-            .WithMany(m => m.Reviews)
-            .HasForeignKey(r => r.MovieId)
-            .OnDelete(DeleteBehavior.Cascade); // Əgər film silinərsə, ona yazılan rəylər də avtomatik silinsin
-        
-        builder.HasOne(r => r.User)
-            .WithMany(u => u.Reviews)
-            .HasForeignKey(r => r.UserId)
+        builder.HasOne(x => x.Movie)
+            .WithMany(x => x.Reviews)
+            .HasForeignKey(x => x.MovieId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.User)
+            .WithMany(x => x.Reviews)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.ReviewLikes)
+            .WithOne(x => x.Review)
+            .HasForeignKey(x => x.ReviewId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

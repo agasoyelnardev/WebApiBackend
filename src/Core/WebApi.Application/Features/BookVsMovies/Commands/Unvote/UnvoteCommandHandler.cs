@@ -9,10 +9,12 @@ namespace WebApi.Application.Features.BookVsMovies.Commands.Unvote;
 public class UnvoteCommandHandler : IRequestHandler<UnvoteCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UnvoteCommandHandler(IAppDbContext context)
+    public UnvoteCommandHandler(IAppDbContext context,ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(UnvoteCommand request, CancellationToken cancellationToken)

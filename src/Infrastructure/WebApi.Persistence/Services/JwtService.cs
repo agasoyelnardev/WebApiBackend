@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
-namespace WebApi.Persistence.Service;
+namespace WebApi.Persistence.Services;
 
 public class JwtService : IJwtService
 {

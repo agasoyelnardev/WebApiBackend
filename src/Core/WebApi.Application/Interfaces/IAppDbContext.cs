@@ -19,10 +19,10 @@ public interface IAppDbContext
     DbSet<BookCollection> BookCollections { get; }
     DbSet<BookCollectionItem> BookCollectionItems { get; }
     DbSet<BookVsMovie> BookVsMovies { get; }
-    DbSet<BookVsMovieVote> BookVsMovieVotes { get; set; }
-    DbSet<MovieCollection> MovieCollections { get; set; }
-    DbSet<MovieCollectionItem> MovieCollectionItems { get; set; }
-    DbSet<Notification> Notifications { get; set; }
+    DbSet<BookVsMovieVote> BookVsMovieVotes { get;  }
+    DbSet<MovieCollection> MovieCollections { get; }
+    DbSet<MovieCollectionItem> MovieCollectionItems { get; }
+    DbSet<Notification> Notifications { get;  }
     DbSet<UserMovieList> UserMovieLists { get; }
     DbSet<UserBookFavorite> UserBookFavorites { get; }
     DbSet<Discussion> Discussions { get; }
@@ -36,7 +36,7 @@ public interface IAppDbContext
     DbSet<WatchHistory> WatchHistories { get; }
     DbSet<UserBookWatchlistItem> UserBookWatchlistItems { get; }
     DbSet<ReviewLike> ReviewLikes { get; }
-    DbSet<BookReviewLike> BookReviewLikes { get; set; }
+    DbSet<BookReviewLike> BookReviewLikes { get; }
     DbSet<BookCollectionLike> BookCollectionLikes { get; }
     DbSet<SavedBookCollection> SavedBookCollections { get; }
 }

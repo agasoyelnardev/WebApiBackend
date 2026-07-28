@@ -3,7 +3,7 @@ using WebApi.Application.Hubs;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
-namespace WebApi.Application.Services;
+namespace WebApi.Persistence.Services;
 
 public class NotificationService : INotificationService
 {

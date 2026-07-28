@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using WebApi.Application.Interfaces;
 
-namespace WebApi.Application.Services;
+namespace WebApi.Persistence.Services;
 
 public class RoomPresenceService : IRoomPresenceService
 {

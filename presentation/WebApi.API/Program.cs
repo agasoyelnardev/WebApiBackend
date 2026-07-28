@@ -7,12 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using WebApi.Application.Features.Chats.Commands;
 using WebApi.Application.Interfaces;
-using WebApi.Application.Services;
-using WebApi.Domain.Entities;
 using WebApi.Persistence.Services;
+using WebApi.Domain.Entities;
 using WebApi.Persistence.Data;
 using WebApi.Persistence.Repositories;
-using WebApi.Persistence.Service;
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();

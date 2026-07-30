@@ -5,22 +5,34 @@ namespace WebApi.Persistence.Services;
 
 public class OnlineUsersTracker : IOnlineUsersTracker
 {
-    // connectionId -> userId
-    private static readonly ConcurrentDictionary<string, string> Connections = new();
+    private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, byte>> UserConnections = new();
 
-    public void AddConnection(string userId, string connectionId)
+    public bool AddConnection(string userId, string connectionId)
     {
-        Connections[connectionId] = userId;
+        var connections = UserConnections.GetOrAdd(userId, _ => new ConcurrentDictionary<string, byte>());
+        var isFirstConnection = connections.IsEmpty;
+        connections[connectionId] = 0;
+        return isFirstConnection;
     }
 
-    public void RemoveConnection(string connectionId)
+    public bool RemoveConnection(string userId, string connectionId)
     {
-        Connections.TryRemove(connectionId, out _);
+        if (!UserConnections.TryGetValue(userId, out var connections))
+            return false;
+
+        connections.TryRemove(connectionId, out _);
+
+        if (connections.IsEmpty)
+        {
+            UserConnections.TryRemove(userId, out _);
+            return true; 
+        }
+
+        return false;
     }
 
     public int GetOnlineCount()
     {
-        // Eyni istifadəçinin bir neçə tab/cihazdan bağlantısı ola bilər — unikal userId sayı
-        return Connections.Values.Distinct().Count();
+        return UserConnections.Count;
     }
 }

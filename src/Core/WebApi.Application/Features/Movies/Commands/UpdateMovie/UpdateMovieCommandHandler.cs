@@ -63,6 +63,9 @@ public class UpdateMovieCommandHandler
         movie.BookSourceId = request.BookSourceId; 
         movie.UpdatedAt = DateTime.UtcNow;
         movie.ExternalUrl = request.ExternalUrl;
+        movie.IsTrending = request.IsTrending;
+        movie.IsTopRated = request.IsTopRated;
+        movie.IsNewRelease = request.IsNewRelease;
 
         await _context.SaveChangesAsync(cancellationToken);
 

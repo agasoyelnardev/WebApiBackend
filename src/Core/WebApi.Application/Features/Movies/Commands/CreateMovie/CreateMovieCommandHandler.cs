@@ -58,6 +58,9 @@ public class CreateMovieCommandHandler
             Cast = request.Cast,
             BookSourceId = request.BookSourceId,
             ExternalUrl = request.ExternalUrl,
+            IsTrending = request.IsTrending,
+            IsTopRated = request.IsTopRated,
+            IsNewRelease = request.IsNewRelease,
         };
 
         await _context.Movies.AddAsync(movie, cancellationToken);

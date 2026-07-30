@@ -2,7 +2,7 @@ namespace WebApi.Application.Interfaces;
 
 public interface IOnlineUsersTracker
 {
-    void AddConnection(string userId, string connectionId);
-    void RemoveConnection(string connectionId);
+    bool AddConnection(string userId, string connectionId);      
+    bool RemoveConnection(string userId, string connectionId);   
     int GetOnlineCount();
 }

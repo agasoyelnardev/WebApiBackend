@@ -22,6 +22,8 @@ public class MovieDto
     public int Likes { get; set; }                 
     public string? ExternalUrl { get; set; }
     public bool IsLikedByCurrentUser { get; set; }       
-
+    public bool IsTrending { get; set; }
+    public bool IsTopRated { get; set; }
+    public bool IsNewRelease { get; set; }
     public BookSourceDto? BookSource { get; set; }
 }

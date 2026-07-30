@@ -28,34 +28,53 @@ public class GetFilteredMoviesQueryHandler : IRequestHandler<GetFilteredMoviesQu
         {
             string term = request.SearchTerm.Trim().ToLower();
             query = query.Where(m =>
-                EF.Functions.Like(m.Title, $"%{term}%") ||
-                EF.Functions.Like(m.Director, $"%{term}%"));
+                EF.Functions.Like(m.Title.ToLower(), $"%{term}%") ||
+                EF.Functions.Like(m.Director.ToLower(), $"%{term}%"));
         }
 
-        // Janr filtri: Siyahının daxilində axtarış edir
-        if (!string.IsNullOrWhiteSpace(request.Genre) && request.Genre != "Bütün Janrlar")
+        // Janr filtri
+        if (!string.IsNullOrWhiteSpace(request.Genre) && request.Genre != "Hamsı")
         {
             query = query.Where(m => m.Genres.Contains(request.Genre));
         }
 
-        // İl filtri
-        if (request.Year.HasValue && request.Year > 0)
+        // İl (Tarix) filtri — aralıq əsaslı
+        if (!string.IsNullOrWhiteSpace(request.YearFilter) && request.YearFilter != "Hamsı")
         {
-            query = query.Where(m => m.Year == request.Year);
+            query = request.YearFilter switch
+            {
+                "2020+" => query.Where(m => m.Year >= 2020),
+                "2010s" => query.Where(m => m.Year >= 2010 && m.Year <= 2019),
+                "2000s" => query.Where(m => m.Year >= 2000 && m.Year <= 2009),
+                "Köhnə" => query.Where(m => m.Year < 2000),
+                _ => query
+            };
         }
 
         // Reytinq filtri
-        if (request.MinRating.HasValue)
+        if (!string.IsNullOrWhiteSpace(request.RatingFilter) && request.RatingFilter != "Hamsı")
         {
-            query = query.Where(m => m.Rating >= request.MinRating);
+            if (double.TryParse(request.RatingFilter, out var minRating))
+            {
+                query = query.Where(m => m.Rating >= minRating);
+            }
         }
+
+        if (request.IsTrending.HasValue)
+            query = query.Where(m => m.IsTrending == request.IsTrending);
+
+        if (request.IsTopRated.HasValue)
+            query = query.Where(m => m.IsTopRated == request.IsTopRated);
+
+        if (request.IsNewRelease.HasValue)
+            query = query.Where(m => m.IsNewRelease == request.IsNewRelease);
 
         // Sıralama məntiqi
         query = request.SortBy switch
         {
-            "rating_desc" => query.OrderByDescending(m => m.Rating),
-            "year_desc" => query.OrderByDescending(m => m.Year),
-            "title_asc" => query.OrderBy(m => m.Title),
+            "rating-desc" => query.OrderByDescending(m => m.Rating),
+            "year-desc" => query.OrderByDescending(m => m.Year),
+            "likes-desc" => query.OrderByDescending(m => m.Likes),
             _ => query.OrderByDescending(m => m.CreatedAt)
         };
 

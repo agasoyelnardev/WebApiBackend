@@ -47,6 +47,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResultDto>
 
         if (!result.Succeeded)
             throw new BadRequestException("Email və ya şifrə yanlışdır.");
+        
+        if (user.IsBanned)
+            throw new UnauthorizedAccessException($"Hesabınız bloklanıb. Səbəb: {user.BanReason ?? "qeyd olunmayıb"}");
 
         var accessToken = await _jwtService.GenerateToken(user);
         var refreshTokenValue = _jwtService.GenerateRefreshToken();

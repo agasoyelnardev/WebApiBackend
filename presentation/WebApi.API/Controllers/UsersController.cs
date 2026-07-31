@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Users.Commands.DeleteUser;
+using WebApi.Application.Features.Users.Commands.SetUserRole;
+using WebApi.Application.Features.Users.Commands.SetUserStatus;
 using WebApi.Application.Features.Users.Commands.ToggleUserRole;
 using WebApi.Application.Features.Users.Commands.UpdateProfile;
+using WebApi.Application.Features.Users.Dtos;
 using WebApi.Application.Features.Users.Queries.GetAllUsers;
 using WebApi.Application.Features.Users.Queries.GetUserProfile;
 using WebApi.Application.Interfaces;
@@ -81,5 +84,26 @@ public class UsersController : ControllerBase
         });
 
         return NoContent();
+    }
+    
+    [HttpPut("{id}/role")]
+    public async Task<IActionResult> SetRole(string id, [FromBody] SetRoleRequest request)
+    {
+        var command = new SetUserRoleCommand { UserId = id, Role = request.Role };
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpPut("{id}/status")]
+    public async Task<IActionResult> SetStatus(string id, [FromBody] SetStatusRequest request)
+    {
+        var command = new SetUserStatusCommand
+        {
+            UserId = id,
+            IsBlocked = request.IsBlocked,
+            Reason = request.Reason
+        };
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 }

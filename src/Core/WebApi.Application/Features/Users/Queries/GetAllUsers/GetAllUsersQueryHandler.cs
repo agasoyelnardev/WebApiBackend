@@ -25,6 +25,9 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, List<Ad
 
         var query = _context.Users.AsQueryable();
 
+        if (request.IsBlocked.HasValue)
+            query = query.Where(u => u.IsBanned == request.IsBlocked);
+        
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var term = request.SearchTerm.Trim().ToLower();

@@ -39,4 +39,5 @@ public interface IAppDbContext
     DbSet<BookReviewLike> BookReviewLikes { get; }
     DbSet<BookCollectionLike> BookCollectionLikes { get; }
     DbSet<SavedBookCollection> SavedBookCollections { get; }
+    DbSet<AdminActivityLog> AdminActivityLogs { get; }
 }

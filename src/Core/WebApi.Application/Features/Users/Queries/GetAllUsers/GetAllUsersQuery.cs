@@ -9,4 +9,5 @@ public class GetAllUsersQuery : IRequest<List<AdminUserDto>>
     public string? Role { get; set; }
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 20;
+    public bool? IsBlocked { get; set; }
 }

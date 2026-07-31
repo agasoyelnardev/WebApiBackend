@@ -16,12 +16,16 @@ public class AppUser : IdentityUser
     public bool IsPremium => PremiumEndDate.HasValue && PremiumEndDate.Value > DateTime.UtcNow;
     public string? LastPremiumPlan { get; set; }
     public DateTime? PremiumStartDate { get; set; }
-    
+   
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
     
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     
-    
+
+    public bool IsBanned { get; set; } = false;
+    public string? BanReason { get; set; }
+    public DateTime? BannedAt { get; set; }
     
     //Follow
     public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>();

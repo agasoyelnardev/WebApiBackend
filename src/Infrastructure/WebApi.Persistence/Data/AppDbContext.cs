@@ -47,6 +47,7 @@ namespace WebApi.Persistence.Data;
         public DbSet<BookReviewLike> BookReviewLikes { get; set; }   
         public DbSet<BookCollectionLike> BookCollectionLikes { get; set; }
         public DbSet<SavedBookCollection> SavedBookCollections { get; set; }
+        public DbSet<AdminActivityLog> AdminActivityLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

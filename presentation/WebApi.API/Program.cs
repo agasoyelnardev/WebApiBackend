@@ -16,6 +16,7 @@ using WebApi.Persistence.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSignalR();
 
+builder.Services.AddScoped<IAdminActivityLogger, AdminActivityLogger>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();

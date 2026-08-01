@@ -24,7 +24,9 @@ public class UpdateBookReviewCommandHandler : IRequestHandler<UpdateBookReviewCo
 
     public async Task Handle(UpdateBookReviewCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Comment))
@@ -44,7 +46,7 @@ public class UpdateBookReviewCommandHandler : IRequestHandler<UpdateBookReviewCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (review.UserId != request.RequestedByUserId && !isAdmin)
+        if (review.UserId != currentUserId && !isAdmin) 
             throw new UnauthorizedAccessException("Bu rəyi yeniləmək hüququnuz yoxdur.");
 
         review.Rating = request.Rating;
@@ -52,7 +54,6 @@ public class UpdateBookReviewCommandHandler : IRequestHandler<UpdateBookReviewCo
         review.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
-
         await _publisher.Publish(new BookRatingChangedEvent(review.BookId), cancellationToken);
     }
 }

@@ -1,6 +1,5 @@
 using MediatR;
 
-
 namespace WebApi.Application.Features.Auth.Commands.Login;
 
 public class LoginCommand : IRequest<AuthResultDto>

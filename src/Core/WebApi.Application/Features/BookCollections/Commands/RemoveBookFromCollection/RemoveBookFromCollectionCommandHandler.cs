@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.BookCollections.Commands.RemoveBookFromCol
 public class RemoveBookFromCollectionCommandHandler : IRequestHandler<RemoveBookFromCollectionCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;   
 
-    public RemoveBookFromCollectionCommandHandler(IAppDbContext context)
+    public RemoveBookFromCollectionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(RemoveBookFromCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.BookCollections
@@ -25,7 +29,7 @@ public class RemoveBookFromCollectionCommandHandler : IRequestHandler<RemoveBook
         if (collection is null)
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
-        if (collection.UserId != request.RequestedByUserId)
+        if (collection.UserId != currentUserId)  
             throw new UnauthorizedAccessException("Bu kolleksiyadan kitab çıxarmaq hüququnuz yoxdur.");
 
         var item = await _context.BookCollectionItems

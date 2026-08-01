@@ -9,20 +9,29 @@ public class UnfollowUserCommandHandler
     : IRequestHandler<UnfollowUserCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UnfollowUserCommandHandler(IAppDbContext context)
+    public UnfollowUserCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(
         UnfollowUserCommand request,
         CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         var follow = await _context.UserFollows
             .FirstOrDefaultAsync(
-                x => x.FollowerId == request.FollowerUserId
-                     && x.FollowingId == request.FollowingUserId,
+                x => x.FollowerId == currentUserId &&
+                     x.FollowingId == request.FollowingUserId,
                 cancellationToken);
 
         if (follow is null)

@@ -12,19 +12,31 @@ public class SendFriendRequestCommandHandler
 {
     private readonly IAppDbContext _context;
     private readonly INotificationService _notificationService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public SendFriendRequestCommandHandler(IAppDbContext context, INotificationService notificationService)
+    public SendFriendRequestCommandHandler(
+        IAppDbContext context,
+        INotificationService notificationService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _notificationService = notificationService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(
         SendFriendRequestCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.SenderId == request.ReceiverId)
-            throw new BadRequestException("Özünüzə dostluq sorğusu göndərə bilməzsiniz.");
+        var senderId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(senderId))
+            throw new UnauthorizedAccessException();
+
+
+        if (senderId == request.ReceiverId)
+            throw new BadRequestException(
+                "Özünüzə dostluq sorğusu göndərə bilməzsiniz.");
 
         var receiverExists = await _context.Users.AnyAsync(
             u => u.Id == request.ReceiverId, cancellationToken);
@@ -34,11 +46,11 @@ public class SendFriendRequestCommandHandler
 
         var exists = await _context.Friendships.AnyAsync(
             x =>
-                (x.SenderId == request.SenderId &&
+                (x.SenderId == senderId &&
                  x.ReceiverId == request.ReceiverId)
                 ||
                 (x.SenderId == request.ReceiverId &&
-                 x.ReceiverId == request.SenderId),
+                 x.ReceiverId ==senderId),
             cancellationToken);
 
         if (exists)
@@ -46,7 +58,7 @@ public class SendFriendRequestCommandHandler
 
         var friendship = new Friendship
         {
-            SenderId = request.SenderId,
+            SenderId = senderId,
             ReceiverId = request.ReceiverId,
             Status = FriendshipStatus.Pending
         };
@@ -55,7 +67,7 @@ public class SendFriendRequestCommandHandler
         await _context.SaveChangesAsync(cancellationToken);
 
         var sender = await _context.Users.FirstOrDefaultAsync(
-            u => u.Id == request.SenderId, cancellationToken);
+            u => u.Id == senderId, cancellationToken);
 
         await _notificationService.NotifyAsync(
             userId: request.ReceiverId,

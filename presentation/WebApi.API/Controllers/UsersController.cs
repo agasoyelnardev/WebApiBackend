@@ -86,6 +86,7 @@ public class UsersController : ControllerBase
         return NoContent();
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}/role")]
     public async Task<IActionResult> SetRole(string id, [FromBody] SetRoleRequest request)
     {
@@ -94,6 +95,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}/status")]
     public async Task<IActionResult> SetStatus(string id, [FromBody] SetStatusRequest request)
     {

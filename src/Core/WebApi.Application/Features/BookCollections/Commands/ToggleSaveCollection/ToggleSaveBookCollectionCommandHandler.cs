@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.BookCollections.Commands.ToggleSaveCollect
 public class ToggleSaveBookCollectionCommandHandler : IRequestHandler<ToggleSaveBookCollectionCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;   
 
-    public ToggleSaveBookCollectionCommandHandler(IAppDbContext context)
+    public ToggleSaveBookCollectionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleSaveBookCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.BookCollections
@@ -26,11 +30,11 @@ public class ToggleSaveBookCollectionCommandHandler : IRequestHandler<ToggleSave
         if (collection is null)
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
-        if (collection.UserId == request.UserId)
+        if (collection.UserId == currentUserId)   
             throw new BadRequestException("Öz kolleksiyanızı saxlaya bilməzsiniz.");
 
         var existing = await _context.SavedBookCollections.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookCollectionId == request.BookCollectionId,
+            x => x.UserId == currentUserId && x.BookCollectionId == request.BookCollectionId,   // ← dəyişdi
             cancellationToken);
 
         if (existing is not null)
@@ -42,7 +46,7 @@ public class ToggleSaveBookCollectionCommandHandler : IRequestHandler<ToggleSave
 
         var saved = new SavedBookCollection
         {
-            UserId = request.UserId,
+            UserId = currentUserId,   
             BookCollectionId = request.BookCollectionId
         };
 

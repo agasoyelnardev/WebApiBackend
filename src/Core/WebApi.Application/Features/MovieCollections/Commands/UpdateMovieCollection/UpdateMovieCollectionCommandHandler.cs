@@ -20,7 +20,9 @@ public class UpdateMovieCollectionCommandHandler : IRequestHandler<UpdateMovieCo
 
     public async Task Handle(UpdateMovieCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -37,7 +39,7 @@ public class UpdateMovieCollectionCommandHandler : IRequestHandler<UpdateMovieCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (collection.AppUserId != request.RequestedByUserId && !isAdmin)
+        if (collection.AppUserId != currentUserId && !isAdmin)   // ← dəyişdi
             throw new UnauthorizedAccessException("Bu kolleksiyanı redaktə etmək hüququnuz yoxdur.");
 
         collection.Name = request.Name;

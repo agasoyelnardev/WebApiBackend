@@ -9,15 +9,21 @@ namespace WebApi.Application.Features.MovieCollections.Commands.ToggleSaveCollec
 public class ToggleSaveCollectionCommandHandler : IRequestHandler<ToggleSaveCollectionCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleSaveCollectionCommandHandler(IAppDbContext context)
+    public ToggleSaveCollectionCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
-    public async Task<bool> Handle(ToggleSaveCollectionCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(
+        ToggleSaveCollectionCommand request,
+        CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        if (string.IsNullOrEmpty(_currentUserService.UserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.MovieCollections
@@ -26,15 +32,17 @@ public class ToggleSaveCollectionCommandHandler : IRequestHandler<ToggleSaveColl
         if (collection is null)
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
-        if (collection.AppUserId == request.UserId)
+        if (collection.AppUserId == _currentUserService.UserId)
             throw new BadRequestException("Öz kolleksiyanızı saxlaya bilməzsiniz.");
 
         if (!collection.IsPublic)
             throw new UnauthorizedAccessException("Bu kolleksiya şəxsidir.");
 
-        var existing = await _context.SavedMovieCollections.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.MovieCollectionId == request.MovieCollectionId,
-            cancellationToken);
+        var existing = await _context.SavedMovieCollections
+            .FirstOrDefaultAsync(
+                x => x.UserId == _currentUserService.UserId &&
+                     x.MovieCollectionId == request.MovieCollectionId,
+                cancellationToken);
 
         if (existing is not null)
         {
@@ -45,7 +53,7 @@ public class ToggleSaveCollectionCommandHandler : IRequestHandler<ToggleSaveColl
 
         var saved = new SavedMovieCollection
         {
-            UserId = request.UserId,
+            UserId = _currentUserService.UserId,
             MovieCollectionId = request.MovieCollectionId
         };
 

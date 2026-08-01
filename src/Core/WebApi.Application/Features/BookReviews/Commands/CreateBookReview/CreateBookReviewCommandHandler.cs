@@ -27,7 +27,9 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
 
     public async Task<Guid> Handle(CreateBookReviewCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Comment))
@@ -46,8 +48,7 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
             throw new NotFoundException("Kitab tapılmadı.");
 
         var alreadyReviewed = await _context.BookReviews.AnyAsync(
-            x => x.BookId == request.BookId && x.UserId == request.UserId,
-            cancellationToken);
+            x => x.BookId == request.BookId && x.UserId == currentUserId, cancellationToken);   // ← dəyişdi
 
         if (alreadyReviewed)
             throw new ConflictException("Siz artıq bu kitaba rəy bildirmisiniz.");
@@ -55,7 +56,7 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
         var review = new BookReview
         {
             BookId = request.BookId,
-            UserId = request.UserId,
+            UserId = currentUserId,   
             Rating = request.Rating,
             Comment = request.Comment
         };
@@ -64,7 +65,7 @@ public class CreateBookReviewCommandHandler : IRequestHandler<CreateBookReviewCo
         await _context.SaveChangesAsync(cancellationToken);
 
         await _publisher.Publish(new BookRatingChangedEvent(review.BookId), cancellationToken);
-        await _pointsService.AwardPointsAsync(_currentUserService.UserId, PointAction.AddReview, cancellationToken);
+        await _pointsService.AwardPointsAsync(currentUserId, PointAction.AddReview, cancellationToken);
         return review.Id;
     }
 }

@@ -20,7 +20,9 @@ public class DeleteMovieCollectionCommandHandler : IRequestHandler<DeleteMovieCo
 
     public async Task Handle(DeleteMovieCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.MovieCollections
@@ -31,7 +33,7 @@ public class DeleteMovieCollectionCommandHandler : IRequestHandler<DeleteMovieCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (collection.AppUserId != request.RequestedByUserId && !isAdmin)
+        if (collection.AppUserId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu kolleksiyanı silmək hüququnuz yoxdur.");
 
         var items = await _context.MovieCollectionItems

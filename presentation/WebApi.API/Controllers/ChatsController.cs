@@ -27,7 +27,6 @@ public class ChatsController : ControllerBase
         if (_currentUserService.UserId is null)
             return Unauthorized();
 
-        command.UserId = _currentUserService.UserId;
         command.Username = _currentUserService.Username ?? "Anonim";
 
         var messageId = await _mediator.Send(command);

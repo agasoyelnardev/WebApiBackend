@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.BookCollections.Commands.CreateBookCollect
 public class CreateBookCollectionCommandHandler : IRequestHandler<CreateBookCollectionCommand, Guid>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;   
 
-    public CreateBookCollectionCommandHandler(IAppDbContext context)
+    public CreateBookCollectionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateBookCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -30,7 +34,7 @@ public class CreateBookCollectionCommandHandler : IRequestHandler<CreateBookColl
             Title = request.Title,
             Description = request.Description,
             Cover = request.Cover,
-            UserId = request.UserId
+            UserId = currentUserId  
         };
 
         await _context.BookCollections.AddAsync(collection, cancellationToken);

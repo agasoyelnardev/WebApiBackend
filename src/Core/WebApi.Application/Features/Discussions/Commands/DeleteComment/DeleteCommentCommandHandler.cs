@@ -18,7 +18,9 @@ public class DeleteCommentCommandHandler : IRequestHandler<DeleteCommentCommand>
 
     public async Task Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var comment = await _context.Comments
@@ -29,7 +31,7 @@ public class DeleteCommentCommandHandler : IRequestHandler<DeleteCommentCommand>
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (comment.AuthorId != request.RequestedByUserId && !isAdmin)
+        if (comment.AuthorId != currentUserId && !isAdmin)
             throw new UnauthorizedAccessException("Bu şərhi silmək hüququnuz yoxdur.");
 
         _context.Comments.Remove(comment);

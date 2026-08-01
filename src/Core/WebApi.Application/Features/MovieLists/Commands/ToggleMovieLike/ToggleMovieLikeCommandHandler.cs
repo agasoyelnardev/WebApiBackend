@@ -9,43 +9,58 @@ namespace WebApi.Application.Features.MovieLists.Commands.ToggleMovieLike;
 public class ToggleMovieLikeCommandHandler : IRequestHandler<ToggleMovieLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleMovieLikeCommandHandler(IAppDbContext context)
+    public ToggleMovieLikeCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
-    public async Task<bool> Handle(ToggleMovieLikeCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(
+        ToggleMovieLikeCommand request,
+        CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var movie = await _context.Movies
-            .FirstOrDefaultAsync(m => m.Id == request.MovieId && !m.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(
+                m => m.Id == request.MovieId && !m.IsDeleted,
+                cancellationToken);
 
         if (movie is null)
             throw new NotFoundException("Film tapılmadı.");
 
-        var existing = await _context.MovieLikes.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.MovieId == request.MovieId,
-            cancellationToken);
+        var existing = await _context.MovieLikes
+            .FirstOrDefaultAsync(
+                x => x.UserId == currentUserId &&
+                     x.MovieId == request.MovieId,
+                cancellationToken);
 
         if (existing is not null)
         {
             _context.MovieLikes.Remove(existing);
             movie.Likes = Math.Max(0, movie.Likes - 1);
+
             await _context.SaveChangesAsync(cancellationToken);
             return false;
         }
 
         var like = new MovieLike
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             MovieId = request.MovieId
         };
 
         await _context.MovieLikes.AddAsync(like, cancellationToken);
+
         movie.Likes++;
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return true;

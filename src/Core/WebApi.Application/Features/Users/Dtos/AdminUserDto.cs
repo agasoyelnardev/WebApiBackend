@@ -9,4 +9,7 @@ public class AdminUserDto
     public string Role { get; set; } = string.Empty;
     public bool IsPremium { get; set; }
     public int Points { get; set; }
+    public bool IsBlocked { get; set; }
+    public string? BanReason { get; set; }
+    public DateTime? BannedAt { get; set; }
 }

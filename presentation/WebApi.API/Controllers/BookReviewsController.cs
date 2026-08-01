@@ -6,8 +6,6 @@ using WebApi.Application.Features.BookReviews.Commands.DeleteBookReview;
 using WebApi.Application.Features.BookReviews.Commands.ToggleBookReviewLike;
 using WebApi.Application.Features.BookReviews.Commands.UpdateBookReview;
 using WebApi.Application.Features.BookReviews.Queries.GetBookReviewsByBookId;
-using WebApi.Application.Interfaces;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Enums;
 
 namespace WebApi.API.Controllers;
@@ -17,20 +15,16 @@ namespace WebApi.API.Controllers;
 public class BookReviewsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ICurrentUserService _currentUserService;
 
-    public BookReviewsController(IMediator mediator, ICurrentUserService currentUserService)
+    public BookReviewsController(IMediator mediator)
     {
         _mediator = mediator;
-        _currentUserService = currentUserService;
     }
 
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateBookReviewCommand command)
     {
-        command.UserId = _currentUserService.UserId;
-
         var reviewId = await _mediator.Send(command);
         return Ok(reviewId);
     }
@@ -40,7 +34,6 @@ public class BookReviewsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateBookReviewCommand command)
     {
         command.Id = id;
-        command.RequestedByUserId = _currentUserService.UserId;
 
         await _mediator.Send(command);
         return NoContent();
@@ -50,10 +43,7 @@ public class BookReviewsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteBookReviewCommand(id)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteBookReviewCommand(id) { });
 
         return NoContent();
     }
@@ -73,7 +63,6 @@ public class BookReviewsController : ControllerBase
         {
             BookReviewId = id,
             Choice = ReviewLikeChoice.Like,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Active = result });
@@ -87,7 +76,6 @@ public class BookReviewsController : ControllerBase
         {
             BookReviewId = id,
             Choice = ReviewLikeChoice.Dislike,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Active = result });

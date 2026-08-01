@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.MovieCollections.Commands.CreateMovieColle
 public class CreateMovieCollectionCommandHandler : IRequestHandler<CreateMovieCollectionCommand, Guid>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;  
 
-    public CreateMovieCollectionCommandHandler(IAppDbContext context)
+    public CreateMovieCollectionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateMovieCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.AppUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Name))
@@ -31,7 +35,7 @@ public class CreateMovieCollectionCommandHandler : IRequestHandler<CreateMovieCo
             Description = request.Description,
             CoverImageUrl = request.CoverImageUrl,
             IsPublic = request.IsPublic,
-            AppUserId = request.AppUserId
+            AppUserId = currentUserId   
         };
 
         await _context.MovieCollections.AddAsync(collection, cancellationToken);

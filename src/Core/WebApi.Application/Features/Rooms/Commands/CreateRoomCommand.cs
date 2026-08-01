@@ -7,24 +7,29 @@ using WebApi.Domain.Entities;
 namespace WebApi.Application.Features.Rooms.Commands;
 
 public record CreateRoomCommand(string RoomName, string Type, Guid? MovieId) : IRequest<Guid>
-{
-    public string CreatedByUserId { get; set; } = string.Empty;
-}
+{ }
 
 public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, Guid>
 {
     private readonly IChatRepository _repository;
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;   
 
-    public CreateRoomCommandHandler(IChatRepository repository, IAppDbContext context)
+    public CreateRoomCommandHandler(
+        IChatRepository repository,
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _repository = repository;
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateRoomCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.CreatedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.RoomName))
@@ -42,7 +47,7 @@ public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, Guid>
                 throw new NotFoundException("Film tapılmadı və ya silinib.");
         }
 
-        var hasActiveRoom = await _repository.HasActiveRoomByUserAsync(request.CreatedByUserId);
+        var hasActiveRoom = await _repository.HasActiveRoomByUserAsync(currentUserId);
         if (hasActiveRoom)
             throw new BadRequestException("Artıq aktiv otağınız var. Yeni otaq yaratmaq üçün əvvəlcə mövcud otağınızı silin.");
 
@@ -51,7 +56,7 @@ public class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, Guid>
             Id = Guid.NewGuid(),
             Title = request.RoomName,
             Type = string.IsNullOrWhiteSpace(request.Type) ? "Movie" : request.Type,
-            CreatedByUserId = request.CreatedByUserId,
+            CreatedByUserId = currentUserId,  
             MovieId = request.MovieId,
             IsLive = true
         };

@@ -9,5 +9,4 @@ public class UpdateReviewCommand : IRequest
     public string Content { get; set; } = string.Empty;
 
     public double Rating { get; set; }
-    public string RequestedByUserId { get; set; } = string.Empty; 
 }

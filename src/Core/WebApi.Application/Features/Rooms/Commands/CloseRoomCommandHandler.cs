@@ -26,7 +26,9 @@ public class CloseRoomCommandHandler : IRequestHandler<CloseRoomCommand, Unit>
 
     public async Task<Unit> Handle(CloseRoomCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var room = await _repository.GetRoomByIdAsync(request.RoomId);
@@ -36,14 +38,14 @@ public class CloseRoomCommandHandler : IRequestHandler<CloseRoomCommand, Unit>
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (room.CreatedByUserId != request.RequestedByUserId && !isAdmin)
+        if (room.CreatedByUserId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu otağı bağlamaq icazəniz yoxdur");
 
         room.IsLive = false;
         await _repository.SaveChangesAsync();
 
         var participantIds = await _context.ChatMessages
-            .Where(m => m.StreamRoomId == request.RoomId && m.UserId != request.RequestedByUserId)
+            .Where(m => m.StreamRoomId == request.RoomId && m.UserId != currentUserId)   
             .Select(m => m.UserId)
             .Distinct()
             .ToListAsync(cancellationToken);

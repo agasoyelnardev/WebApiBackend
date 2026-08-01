@@ -8,6 +8,4 @@ public class UpdateBookCollectionCommand : IRequest
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Cover { get; set; } = string.Empty;
-
-    public string RequestedByUserId { get; set; } = string.Empty;
 }

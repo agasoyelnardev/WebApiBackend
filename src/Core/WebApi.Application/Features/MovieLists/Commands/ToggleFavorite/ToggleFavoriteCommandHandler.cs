@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.MovieLists.Commands.ToggleFavorite;
 public class ToggleFavoriteCommandHandler : IRequestHandler<ToggleFavoriteCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleFavoriteCommandHandler(IAppDbContext context)
+    public ToggleFavoriteCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleFavoriteCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var movieExists = await _context.Movies
@@ -27,7 +31,7 @@ public class ToggleFavoriteCommandHandler : IRequestHandler<ToggleFavoriteComman
             throw new NotFoundException("Film tapılmadı.");
 
         var existing = await _context.UserMovieLists.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId
+            x => x.UserId == currentUserId
                  && x.MovieId == request.MovieId
                  && x.Type == MovieListType.Favorite,
             cancellationToken);
@@ -36,12 +40,12 @@ public class ToggleFavoriteCommandHandler : IRequestHandler<ToggleFavoriteComman
         {
             _context.UserMovieLists.Remove(existing);
             await _context.SaveChangesAsync(cancellationToken);
-            return false; 
+            return false;
         }
 
         var item = new UserMovieList
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             MovieId = request.MovieId,
             Type = MovieListType.Favorite
         };
@@ -49,6 +53,6 @@ public class ToggleFavoriteCommandHandler : IRequestHandler<ToggleFavoriteComman
         await _context.UserMovieLists.AddAsync(item, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return true; 
+        return true;
     }
 }

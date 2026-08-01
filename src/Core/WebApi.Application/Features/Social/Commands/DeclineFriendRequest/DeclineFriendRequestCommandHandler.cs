@@ -10,16 +10,25 @@ public class DeclineFriendRequestCommandHandler
     : IRequestHandler<DeclineFriendRequestCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public DeclineFriendRequestCommandHandler(IAppDbContext context)
+    public DeclineFriendRequestCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(
         DeclineFriendRequestCommand request,
         CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         var friendship = await _context.Friendships
             .FirstOrDefaultAsync(
                 x => x.Id == request.FriendshipId,
@@ -28,7 +37,7 @@ public class DeclineFriendRequestCommandHandler
         if (friendship is null)
             throw new NotFoundException("Dostluq sorğusu tapılmadı.");
 
-        if (friendship.ReceiverId != request.UserId)
+        if (friendship.ReceiverId != currentUserId)
             throw new UnauthorizedAccessException("Bu sorğunu rədd etmək icazəniz yoxdur.");
 
         if (friendship.Status != FriendshipStatus.Pending)

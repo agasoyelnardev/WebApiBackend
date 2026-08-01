@@ -43,7 +43,6 @@ public class ReviewsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateReviewCommand command)
     {
-        command.UserId = _currentUserService.UserId;
         var reviewId = await _mediator.Send(command);
         return Ok(reviewId);
     }
@@ -52,10 +51,7 @@ public class ReviewsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteReviewCommand(id)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteReviewCommand(id) { });
         return NoContent();
     }
 
@@ -64,7 +60,6 @@ public class ReviewsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateReviewCommand command)
     {
         command.Id = id;
-        command.RequestedByUserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -77,7 +72,6 @@ public class ReviewsController : ControllerBase
         {
             ReviewId = id,
             Choice = ReviewLikeChoice.Like,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Active = result });
@@ -91,7 +85,6 @@ public class ReviewsController : ControllerBase
         {
             ReviewId = id,
             Choice = ReviewLikeChoice.Dislike,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Active = result });

@@ -18,7 +18,9 @@ public class UpdateDiscussionCommandHandler : IRequestHandler<UpdateDiscussionCo
 
     public async Task Handle(UpdateDiscussionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -41,7 +43,7 @@ public class UpdateDiscussionCommandHandler : IRequestHandler<UpdateDiscussionCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (discussion.AuthorId != request.RequestedByUserId && !isAdmin)
+        if (discussion.AuthorId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu müzakirəni redaktə etmək hüququnuz yoxdur.");
 
         discussion.Title = request.Title;

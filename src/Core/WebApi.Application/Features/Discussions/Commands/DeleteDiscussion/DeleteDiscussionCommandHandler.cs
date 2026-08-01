@@ -18,7 +18,9 @@ public class DeleteDiscussionCommandHandler : IRequestHandler<DeleteDiscussionCo
 
     public async Task Handle(DeleteDiscussionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var discussion = await _context.Discussions
@@ -29,7 +31,7 @@ public class DeleteDiscussionCommandHandler : IRequestHandler<DeleteDiscussionCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (discussion.AuthorId != request.RequestedByUserId && !isAdmin)
+        if (discussion.AuthorId != currentUserId && !isAdmin)  
             throw new UnauthorizedAccessException("Bu müzakirəni silmək hüququnuz yoxdur.");
 
         var comments = await _context.Comments

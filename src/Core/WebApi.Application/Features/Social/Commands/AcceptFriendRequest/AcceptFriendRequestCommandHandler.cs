@@ -11,11 +11,16 @@ public class AcceptFriendRequestCommandHandler
 {
     private readonly IAppDbContext _context;
     private readonly INotificationService _notificationService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public AcceptFriendRequestCommandHandler(IAppDbContext context, INotificationService notificationService)
+    public AcceptFriendRequestCommandHandler(
+        IAppDbContext context,
+        INotificationService notificationService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _notificationService = notificationService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(
@@ -27,10 +32,15 @@ public class AcceptFriendRequestCommandHandler
                 x => x.Id == request.FriendshipId,
                 cancellationToken);
 
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+        
         if (friendship is null)
             throw new NotFoundException("Dostluq sorğusu tapılmadı.");
 
-        if (friendship.ReceiverId != request.UserId)
+        if (friendship.ReceiverId != currentUserId)
             throw new UnauthorizedAccessException("Bu sorğunu qəbul etmək icazəniz yoxdur.");
 
         if (friendship.Status != FriendshipStatus.Pending)
@@ -42,7 +52,7 @@ public class AcceptFriendRequestCommandHandler
         await _context.SaveChangesAsync(cancellationToken);
 
         var accepter = await _context.Users.FirstOrDefaultAsync(
-            u => u.Id == request.UserId, cancellationToken);
+            u => u.Id == currentUserId, cancellationToken);
 
         await _notificationService.NotifyAsync(
             userId: friendship.SenderId,

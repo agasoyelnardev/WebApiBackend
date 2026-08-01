@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.Notifications.Commands.DeleteNotification;
 public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificationCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public DeleteNotificationCommandHandler(IAppDbContext context)
+    public DeleteNotificationCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(DeleteNotificationCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var notification = await _context.Notifications
@@ -25,7 +29,7 @@ public class DeleteNotificationCommandHandler : IRequestHandler<DeleteNotificati
         if (notification is null)
             throw new NotFoundException("Bildiriş tapılmadı.");
 
-        if (notification.UserId != request.UserId)
+        if (notification.UserId != currentUserId)
             throw new UnauthorizedAccessException("Bu bildirişi silmək icazəniz yoxdur.");
 
         _context.Notifications.Remove(notification);

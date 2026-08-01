@@ -19,7 +19,9 @@ public class UnvoteCommandHandler : IRequestHandler<UnvoteCommand>
 
     public async Task Handle(UnvoteCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var userId = _currentUserService.UserId;  
+
+        if (string.IsNullOrEmpty(userId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var comparison = await _context.BookVsMovies
@@ -30,7 +32,7 @@ public class UnvoteCommandHandler : IRequestHandler<UnvoteCommand>
 
         var existingVote = await _context.BookVsMovieVotes
             .FirstOrDefaultAsync(
-                v => v.BookVsMovieId == request.BookVsMovieId && v.UserId == request.UserId,
+                v => v.BookVsMovieId == request.BookVsMovieId && v.UserId == userId,   // ← dəyişdi
                 cancellationToken);
 
         if (existingVote is null)

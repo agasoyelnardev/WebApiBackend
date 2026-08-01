@@ -118,7 +118,6 @@ public class ChatHub : Hub
 
         var command = new SendMessageCommand(roomGuid, messageText)
         {
-            UserId = userId,
             Username = username
         };
 

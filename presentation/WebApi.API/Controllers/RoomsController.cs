@@ -31,7 +31,6 @@ public class RoomsController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> CreateRoom([FromBody] CreateRoomCommand command)
     {
-        command.CreatedByUserId = _currentUserService.UserId;
 
         var roomId = await _mediator.Send(command);
         return Ok(new { Message = "Otaq yarandı", RoomId = roomId });
@@ -40,10 +39,7 @@ public class RoomsController : ControllerBase
     [HttpDelete("{roomId}")]
     public async Task<IActionResult> DeleteRoom(Guid roomId)
     {
-        await _mediator.Send(new DeleteRoomCommand(roomId)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteRoomCommand(roomId) { });
 
         return Ok(new { Message = "Otaq silindi" });
     }
@@ -52,9 +48,7 @@ public class RoomsController : ControllerBase
     public async Task<IActionResult> CloseRoom(Guid roomId)
     {
         await _mediator.Send(new CloseRoomCommand(roomId)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        { });
 
         return Ok(new { Message = "Otaq bağlandı" });
     }
@@ -66,7 +60,6 @@ public class RoomsController : ControllerBase
         {
             RoomId = roomId,
             NewHostUserId = newHostUserId,
-            RequestedByUserId = _currentUserService.UserId
         });
 
         return Ok(new { Message = "Host statusu ötürüldü" });

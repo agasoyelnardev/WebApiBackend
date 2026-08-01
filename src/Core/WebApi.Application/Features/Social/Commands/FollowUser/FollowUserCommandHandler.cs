@@ -11,18 +11,28 @@ public class FollowUserCommandHandler
 {
     private readonly IAppDbContext _context;
     private readonly INotificationService _notificationService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public FollowUserCommandHandler(IAppDbContext context, INotificationService notificationService)
+    public FollowUserCommandHandler(
+        IAppDbContext context,
+        INotificationService notificationService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _notificationService = notificationService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(
         FollowUserCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.FollowerUserId == request.FollowingUserId)
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+        
+        if (currentUserId == request.FollowingUserId)
             throw new BadRequestException("Özünüzü izləyə bilməzsiniz.");
 
         var targetUserExists = await _context.Users.AnyAsync(
@@ -32,7 +42,7 @@ public class FollowUserCommandHandler
             throw new NotFoundException("İstifadəçi tapılmadı.");
 
         var exists = await _context.UserFollows.AnyAsync(
-            x => x.FollowerId == request.FollowerUserId
+            x => x.FollowerId == currentUserId
                  && x.FollowingId == request.FollowingUserId,
             cancellationToken);
 
@@ -41,7 +51,7 @@ public class FollowUserCommandHandler
 
         var follow = new UserFollow
         {
-            FollowerId = request.FollowerUserId,
+            FollowerId = currentUserId,
             FollowingId = request.FollowingUserId
         };
 
@@ -49,7 +59,7 @@ public class FollowUserCommandHandler
         await _context.SaveChangesAsync(cancellationToken);
 
         var follower = await _context.Users.FirstOrDefaultAsync(
-            u => u.Id == request.FollowerUserId, cancellationToken);
+            u => u.Id == currentUserId, cancellationToken);
 
         await _notificationService.NotifyAsync(
             userId: request.FollowingUserId,

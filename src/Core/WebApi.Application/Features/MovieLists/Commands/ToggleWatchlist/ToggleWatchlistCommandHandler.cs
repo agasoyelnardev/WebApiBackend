@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.MovieLists.Commands.ToggleWatchlist;
 public class ToggleWatchlistCommandHandler : IRequestHandler<ToggleWatchlistCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleWatchlistCommandHandler(IAppDbContext context)
+    public ToggleWatchlistCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleWatchlistCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var movieExists = await _context.Movies
@@ -27,7 +31,7 @@ public class ToggleWatchlistCommandHandler : IRequestHandler<ToggleWatchlistComm
             throw new NotFoundException("Film tapılmadı.");
 
         var existing = await _context.UserMovieLists.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId
+            x => x.UserId == currentUserId
                  && x.MovieId == request.MovieId
                  && x.Type == MovieListType.Watchlist,
             cancellationToken);
@@ -41,7 +45,7 @@ public class ToggleWatchlistCommandHandler : IRequestHandler<ToggleWatchlistComm
 
         var item = new UserMovieList
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             MovieId = request.MovieId,
             Type = MovieListType.Watchlist
         };

@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.MovieCollections.Commands.AddMovieToCollec
 public class AddMovieToCollectionCommandHandler : IRequestHandler<AddMovieToCollectionCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;  
 
-    public AddMovieToCollectionCommandHandler(IAppDbContext context)
+    public AddMovieToCollectionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(AddMovieToCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.MovieCollections
@@ -26,7 +30,7 @@ public class AddMovieToCollectionCommandHandler : IRequestHandler<AddMovieToColl
         if (collection is null)
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
-        if (collection.AppUserId != request.RequestedByUserId)
+        if (collection.AppUserId != currentUserId)   
             throw new UnauthorizedAccessException("Bu kolleksiyaya film əlavə etmək hüququnuz yoxdur.");
 
         var movieExists = await _context.Movies

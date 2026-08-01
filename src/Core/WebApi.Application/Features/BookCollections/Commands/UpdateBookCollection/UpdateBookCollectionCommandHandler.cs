@@ -20,7 +20,9 @@ public class UpdateBookCollectionCommandHandler : IRequestHandler<UpdateBookColl
 
     public async Task Handle(UpdateBookCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -37,7 +39,7 @@ public class UpdateBookCollectionCommandHandler : IRequestHandler<UpdateBookColl
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (collection.UserId != request.RequestedByUserId && !isAdmin)
+        if (collection.UserId != currentUserId && !isAdmin)  
             throw new UnauthorizedAccessException("Bu kolleksiyanı redaktə etmək hüququnuz yoxdur.");
 
         collection.Title = request.Title;

@@ -5,7 +5,6 @@ namespace WebApi.Application.Features.Reviews.Commands.DeleteReview;
 public class DeleteReviewCommand : IRequest<Unit>
 {
     public Guid Id { get; set; }
-    public string RequestedByUserId { get; set; } = string.Empty;
 
     public DeleteReviewCommand(Guid id)
     {

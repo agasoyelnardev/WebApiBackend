@@ -9,6 +9,4 @@ public class UpdateMovieCollectionCommand : IRequest
     public string? Description { get; set; }
     public string? CoverImageUrl { get; set; }
     public bool IsPublic { get; set; }
-
-    public string RequestedByUserId { get; set; } = string.Empty;
 }

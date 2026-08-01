@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.Discussions.Commands.ToggleDiscussionLike;
 public class ToggleDiscussionLikeCommandHandler : IRequestHandler<ToggleDiscussionLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleDiscussionLikeCommandHandler(IAppDbContext context)
+    public ToggleDiscussionLikeCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleDiscussionLikeCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var discussionExists = await _context.Discussions
@@ -27,7 +31,7 @@ public class ToggleDiscussionLikeCommandHandler : IRequestHandler<ToggleDiscussi
             throw new NotFoundException("Müzakirə tapılmadı.");
 
         var existing = await _context.DiscussionLikes.FirstOrDefaultAsync(
-            x => x.DiscussionId == request.DiscussionId && x.UserId == request.UserId,
+            x => x.DiscussionId == request.DiscussionId && x.UserId == currentUserId,
             cancellationToken);
 
         if (existing is not null)
@@ -40,7 +44,7 @@ public class ToggleDiscussionLikeCommandHandler : IRequestHandler<ToggleDiscussi
         var like = new DiscussionLike
         {
             DiscussionId = request.DiscussionId,
-            UserId = request.UserId
+            UserId = currentUserId
         };
 
         await _context.DiscussionLikes.AddAsync(like, cancellationToken);

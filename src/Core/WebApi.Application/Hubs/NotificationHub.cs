@@ -68,7 +68,7 @@ public class NotificationHub : Hub
         if (string.IsNullOrEmpty(userId))
             return;
 
-        await _mediator.Send(new ToggleNotificationReadCommand { Id = notificationId, UserId = userId });
+        await _mediator.Send(new ToggleNotificationReadCommand { Id = notificationId, });
 
         var unreadCount = await _mediator.Send(new GetUnreadNotificationsCountQuery { UserId = userId });
         await Clients.Group(userId).SendAsync("ReceiveUnreadNotificationCount", unreadCount);

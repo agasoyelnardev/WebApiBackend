@@ -19,7 +19,7 @@ public class VoteCommandHandler : IRequestHandler<VoteCommand>
     public async Task Handle(VoteCommand request, CancellationToken cancellationToken)
     {
         var userId = _currentUserService.UserId;
-        
+
         if (string.IsNullOrEmpty(userId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
@@ -31,16 +31,15 @@ public class VoteCommandHandler : IRequestHandler<VoteCommand>
 
         var existingVote = await _context.BookVsMovieVotes
             .FirstOrDefaultAsync(
-                v => v.BookVsMovieId == request.BookVsMovieId && v.UserId == request.UserId,
+                v => v.BookVsMovieId == request.BookVsMovieId && v.UserId == userId,   
                 cancellationToken);
-        
+
         if (existingVote is null)
         {
-            // Yeni səs
             var vote = new BookVsMovieVote
             {
                 BookVsMovieId = request.BookVsMovieId,
-                UserId = request.UserId,
+                UserId = userId,  
                 Choice = request.Choice
             };
 
@@ -53,7 +52,6 @@ public class VoteCommandHandler : IRequestHandler<VoteCommand>
         }
         else if (existingVote.Choice != request.Choice)
         {
-            // Seçimi dəyişir: köhnə tərəfdən çıxar, yeni tərəfə əlavə et
             if (existingVote.Choice == VoteChoice.Book)
                 comparison.BookVotes--;
             else
@@ -67,7 +65,6 @@ public class VoteCommandHandler : IRequestHandler<VoteCommand>
             existingVote.Choice = request.Choice;
             existingVote.UpdatedAt = DateTime.UtcNow;
         }
-        // existingVote.Choice == request.Choice olsaydı, heç nə etmirik (artıq bu seçimə səs verib)
 
         await _context.SaveChangesAsync(cancellationToken);
     }

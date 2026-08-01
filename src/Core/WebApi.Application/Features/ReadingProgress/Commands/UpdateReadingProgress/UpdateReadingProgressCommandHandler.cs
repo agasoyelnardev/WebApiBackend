@@ -9,16 +9,23 @@ public class UpdateReadingProgressCommandHandler : IRequestHandler<UpdateReading
 {
     private readonly IAppDbContext _context;
     private readonly IPointsService _pointsService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateReadingProgressCommandHandler(IAppDbContext context, IPointsService pointsService)
+    public UpdateReadingProgressCommandHandler(
+        IAppDbContext context,
+        IPointsService pointsService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _pointsService = pointsService;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(UpdateReadingProgressCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (request.PercentageComplete < 0 || request.PercentageComplete > 100)
@@ -31,7 +38,7 @@ public class UpdateReadingProgressCommandHandler : IRequestHandler<UpdateReading
             throw new NotFoundException("Kitab tapılmadı.");
 
         var progress = await _context.ReadingProgresses.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookId == request.BookId,
+            x => x.UserId == currentUserId && x.BookId == request.BookId,
             cancellationToken);
 
         var previousPercentage = progress?.PercentageComplete ?? 0;
@@ -40,7 +47,7 @@ public class UpdateReadingProgressCommandHandler : IRequestHandler<UpdateReading
         {
             progress = new Domain.Entities.ReadingProgress
             {
-                UserId = request.UserId,
+                UserId = currentUserId,
                 BookId = request.BookId,
                 PercentageComplete = request.PercentageComplete
             };
@@ -55,14 +62,13 @@ public class UpdateReadingProgressCommandHandler : IRequestHandler<UpdateReading
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Yalnız İLK DƏFƏ 50%/100%-ə çatanda xal ver
         if (previousPercentage < 100 && request.PercentageComplete >= 100)
         {
-            await _pointsService.AwardPointsAsync(request.UserId, PointAction.ReadingProgress100, cancellationToken);
+            await _pointsService.AwardPointsAsync(currentUserId, PointAction.ReadingProgress100, cancellationToken);
         }
         else if (previousPercentage < 50 && request.PercentageComplete >= 50)
         {
-            await _pointsService.AwardPointsAsync(request.UserId, PointAction.ReadingProgress50, cancellationToken);
+            await _pointsService.AwardPointsAsync(currentUserId, PointAction.ReadingProgress50, cancellationToken);
         }
     }
 }

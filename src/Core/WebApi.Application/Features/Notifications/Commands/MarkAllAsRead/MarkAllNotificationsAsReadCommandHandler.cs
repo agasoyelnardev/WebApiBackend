@@ -7,19 +7,23 @@ namespace WebApi.Application.Features.Notifications.Commands.MarkAllAsRead;
 public class MarkAllNotificationsAsReadCommandHandler : IRequestHandler<MarkAllNotificationsAsReadCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public MarkAllNotificationsAsReadCommandHandler(IAppDbContext context)
+    public MarkAllNotificationsAsReadCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(MarkAllNotificationsAsReadCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var unreadNotifications = await _context.Notifications
-            .Where(n => n.UserId == request.UserId && !n.IsRead)
+            .Where(n => n.UserId == currentUserId && !n.IsRead)
             .ToListAsync(cancellationToken);
 
         foreach (var notification in unreadNotifications)

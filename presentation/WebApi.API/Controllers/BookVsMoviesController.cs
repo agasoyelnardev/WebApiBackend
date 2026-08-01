@@ -68,7 +68,6 @@ public class BookVsMoviesController : ControllerBase
         {
             BookVsMovieId = id,
             Choice = choice,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Message = "Səsiniz qeydə alındı" });
@@ -81,7 +80,6 @@ public class BookVsMoviesController : ControllerBase
         await _mediator.Send(new UnvoteCommand
         {
             BookVsMovieId = id,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Message = "Səsiniz geri çəkildi" });

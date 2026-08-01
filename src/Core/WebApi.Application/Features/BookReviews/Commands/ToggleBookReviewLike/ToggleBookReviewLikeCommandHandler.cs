@@ -10,15 +10,19 @@ namespace WebApi.Application.Features.BookReviews.Commands.ToggleBookReviewLike;
 public class ToggleBookReviewLikeCommandHandler : IRequestHandler<ToggleBookReviewLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleBookReviewLikeCommandHandler(IAppDbContext context)
+    public ToggleBookReviewLikeCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleBookReviewLikeCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var review = await _context.BookReviews
@@ -28,14 +32,14 @@ public class ToggleBookReviewLikeCommandHandler : IRequestHandler<ToggleBookRevi
             throw new NotFoundException("Rəy tapılmadı.");
 
         var existing = await _context.BookReviewLikes.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookReviewId == request.BookReviewId,
+            x => x.UserId == currentUserId && x.BookReviewId == request.BookReviewId,
             cancellationToken);
 
         if (existing is null)
         {
             var like = new BookReviewLike
             {
-                UserId = request.UserId,
+                UserId = currentUserId,
                 BookReviewId = request.BookReviewId,
                 Choice = request.Choice
             };

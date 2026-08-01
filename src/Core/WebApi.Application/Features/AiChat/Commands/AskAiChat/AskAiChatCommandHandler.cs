@@ -10,11 +10,16 @@ public class AskAiChatCommandHandler : IRequestHandler<AskAiChatCommand, string>
 {
     private readonly IAiChatService _aiChatService;
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;  
 
-    public AskAiChatCommandHandler(IAiChatService aiChatService, IAppDbContext context)
+    public AskAiChatCommandHandler(
+        IAiChatService aiChatService,
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _aiChatService = aiChatService;
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<string> Handle(AskAiChatCommand request, CancellationToken cancellationToken)
@@ -25,14 +30,15 @@ public class AskAiChatCommandHandler : IRequestHandler<AskAiChatCommand, string>
         if (request.Message.Length > 1000)
             throw new BadRequestException("Mesaj maksimum 1000 simvol ola bilər.");
 
+        var currentUserId = _currentUserService.UserId; 
         string? contextPrompt = null;
 
-        if (!string.IsNullOrEmpty(request.UserId))
+        if (!string.IsNullOrEmpty(currentUserId))
         {
             var contextParts = new List<string>();
 
             var favoriteMovies = await _context.UserMovieLists
-                .Where(x => x.UserId == request.UserId && x.Type == MovieListType.Favorite)
+                .Where(x => x.UserId == currentUserId && x.Type == MovieListType.Favorite)
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => x.Movie.Title)
                 .Take(5)
@@ -42,7 +48,7 @@ public class AskAiChatCommandHandler : IRequestHandler<AskAiChatCommand, string>
                 contextParts.Add($"İstifadəçinin sevimli filmləri: {string.Join(", ", favoriteMovies)}.");
 
             var favoriteBooks = await _context.UserBookFavorites
-                .Where(x => x.UserId == request.UserId)
+                .Where(x => x.UserId == currentUserId)
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => x.Book.Title)
                 .Take(5)
@@ -51,9 +57,8 @@ public class AskAiChatCommandHandler : IRequestHandler<AskAiChatCommand, string>
             if (favoriteBooks.Count > 0)
                 contextParts.Add($"İstifadəçinin sevimli kitabları: {string.Join(", ", favoriteBooks)}.");
 
-            // YENİ: son izlədiyi filmlər
             var recentlyWatched = await _context.WatchHistories
-                .Where(x => x.UserId == request.UserId)
+                .Where(x => x.UserId == currentUserId)
                 .OrderByDescending(x => x.CreatedAt)
                 .Select(x => x.Movie.Title)
                 .Take(5)
@@ -62,9 +67,8 @@ public class AskAiChatCommandHandler : IRequestHandler<AskAiChatCommand, string>
             if (recentlyWatched.Count > 0)
                 contextParts.Add($"İstifadəçinin son izlədiyi filmlər: {string.Join(", ", recentlyWatched)}.");
 
-            // YENİ: hazırda oxumaqda olduğu kitablar (tamamlanmamış, 0-dan böyük progress)
             var currentlyReading = await _context.ReadingProgresses
-                .Where(x => x.UserId == request.UserId && x.PercentageComplete > 0 && x.PercentageComplete < 100)
+                .Where(x => x.UserId == currentUserId && x.PercentageComplete > 0 && x.PercentageComplete < 100)
                 .OrderByDescending(x => x.UpdatedAt)
                 .Select(x => new { x.Book.Title, x.PercentageComplete })
                 .Take(3)

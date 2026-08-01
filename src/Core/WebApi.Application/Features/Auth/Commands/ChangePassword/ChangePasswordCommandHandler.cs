@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using WebApi.Application.Common.Exceptions;
+using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
 namespace WebApi.Application.Features.Auth.Commands.ChangePassword;
@@ -8,15 +9,21 @@ namespace WebApi.Application.Features.Auth.Commands.ChangePassword;
 public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand>
 {
     private readonly UserManager<AppUser> _userManager;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ChangePasswordCommandHandler(UserManager<AppUser> userManager)
+    public ChangePasswordCommandHandler(
+        UserManager<AppUser> userManager,
+        ICurrentUserService currentUserService)
     {
         _userManager = userManager;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.CurrentPassword))
@@ -28,7 +35,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         if (request.NewPassword.Length < 6)
             throw new BadRequestException("Yeni şifrə ən azı 6 simvol olmalıdır.");
 
-        var user = await _userManager.FindByIdAsync(request.UserId);
+        var user = await _userManager.FindByIdAsync(currentUserId);   // ← JWT-dən, request.UserId-dən DEYİL
 
         if (user is null)
             throw new NotFoundException("İstifadəçi tapılmadı.");

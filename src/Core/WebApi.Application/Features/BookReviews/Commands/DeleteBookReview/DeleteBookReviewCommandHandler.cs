@@ -24,7 +24,9 @@ public class DeleteBookReviewCommandHandler : IRequestHandler<DeleteBookReviewCo
 
     public async Task Handle(DeleteBookReviewCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var review = await _context.BookReviews
@@ -35,7 +37,7 @@ public class DeleteBookReviewCommandHandler : IRequestHandler<DeleteBookReviewCo
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (review.UserId != request.RequestedByUserId && !isAdmin)
+        if (review.UserId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu rəyi silmək hüququnuz yoxdur.");
 
         var bookId = review.BookId;

@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.BookCollections.Commands.ToggleCollectionL
 public class ToggleBookCollectionLikeCommandHandler : IRequestHandler<ToggleBookCollectionLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;   
 
-    public ToggleBookCollectionLikeCommandHandler(IAppDbContext context)
+    public ToggleBookCollectionLikeCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleBookCollectionLikeCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collectionExists = await _context.BookCollections
@@ -27,7 +31,7 @@ public class ToggleBookCollectionLikeCommandHandler : IRequestHandler<ToggleBook
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
         var existing = await _context.BookCollectionLikes.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookCollectionId == request.BookCollectionId,
+            x => x.UserId == currentUserId && x.BookCollectionId == request.BookCollectionId,   // ← dəyişdi
             cancellationToken);
 
         if (existing is not null)
@@ -39,7 +43,7 @@ public class ToggleBookCollectionLikeCommandHandler : IRequestHandler<ToggleBook
 
         var like = new BookCollectionLike
         {
-            UserId = request.UserId,
+            UserId = currentUserId,   
             BookCollectionId = request.BookCollectionId
         };
 

@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.BookLists.Commands.ToggleBookWatchlist;
 public class ToggleBookWatchlistCommandHandler : IRequestHandler<ToggleBookWatchlistCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleBookWatchlistCommandHandler(IAppDbContext context)
+    public ToggleBookWatchlistCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleBookWatchlistCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var bookExists = await _context.Books
@@ -27,7 +31,7 @@ public class ToggleBookWatchlistCommandHandler : IRequestHandler<ToggleBookWatch
             throw new NotFoundException("Kitab tapılmadı.");
 
         var existing = await _context.UserBookWatchlistItems.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookId == request.BookId,
+            x => x.UserId == currentUserId && x.BookId == request.BookId,
             cancellationToken);
 
         if (existing is not null)
@@ -39,7 +43,7 @@ public class ToggleBookWatchlistCommandHandler : IRequestHandler<ToggleBookWatch
 
         var item = new UserBookWatchlistItem
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             BookId = request.BookId
         };
 

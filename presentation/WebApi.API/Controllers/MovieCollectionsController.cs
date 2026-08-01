@@ -5,7 +5,7 @@ using WebApi.Application.Features.MovieCollections.Commands.AddMovieToCollection
 using WebApi.Application.Features.MovieCollections.Commands.CreateMovieCollection;
 using WebApi.Application.Features.MovieCollections.Commands.DeleteMovieCollection;
 using WebApi.Application.Features.MovieCollections.Commands.RemoveMovieFromCollection;
-using WebApi.Application.Features.MovieCollections.Commands.ToggleCollectionLike;
+using WebApi.Application.Features.MovieCollections.Commands.ToggleMovieCollectionLike;
 using WebApi.Application.Features.MovieCollections.Commands.ToggleSaveCollection;
 using WebApi.Application.Features.MovieCollections.Commands.UpdateMovieCollection;
 using WebApi.Application.Features.MovieCollections.Queries.GetMovieCollectionById;
@@ -32,7 +32,6 @@ public class MovieCollectionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateMovieCollectionCommand command)
     {
-        command.AppUserId = _currentUserService.UserId;
         var id = await _mediator.Send(command);
         return Ok(id);
     }
@@ -42,7 +41,6 @@ public class MovieCollectionsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateMovieCollectionCommand command)
     {
         command.Id = id;
-        command.RequestedByUserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -51,10 +49,7 @@ public class MovieCollectionsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteMovieCollectionCommand(id)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteMovieCollectionCommand(id));
         return NoContent();
     }
 
@@ -65,9 +60,9 @@ public class MovieCollectionsController : ControllerBase
         await _mediator.Send(new AddMovieToCollectionCommand
         {
             MovieCollectionId = id,
-            MovieId = movieId,
-            RequestedByUserId = _currentUserService.UserId
+            MovieId = movieId
         });
+
         return Ok(new { Message = "Film kolleksiyaya əlavə edildi" });
     }
 
@@ -78,9 +73,9 @@ public class MovieCollectionsController : ControllerBase
         await _mediator.Send(new RemoveMovieFromCollectionCommand
         {
             MovieCollectionId = id,
-            MovieId = movieId,
-            RequestedByUserId = _currentUserService.UserId
+            MovieId = movieId
         });
+
         return Ok(new { Message = "Film kolleksiyadan çıxarıldı" });
     }
 
@@ -89,6 +84,7 @@ public class MovieCollectionsController : ControllerBase
     {
         var collections = await _mediator.Send(
             new GetUserMovieCollectionsQuery(userId, _currentUserService.UserId));
+
         return Ok(collections);
     }
 
@@ -103,15 +99,14 @@ public class MovieCollectionsController : ControllerBase
 
         return Ok(collection);
     }
-    
+
     [Authorize]
     [HttpPost("{id}/save")]
     public async Task<IActionResult> ToggleSave(Guid id)
     {
         var isSaved = await _mediator.Send(new ToggleSaveCollectionCommand
         {
-            MovieCollectionId = id,
-            UserId = _currentUserService.UserId
+            MovieCollectionId = id
         });
 
         return Ok(new { IsSaved = isSaved });
@@ -121,18 +116,17 @@ public class MovieCollectionsController : ControllerBase
     [HttpGet("saved")]
     public async Task<IActionResult> GetSaved()
     {
-        var collections = await _mediator.Send(new GetSavedMovieCollectionsQuery(_currentUserService.UserId));
+        var collections = await _mediator.Send(new GetSavedMovieCollectionsQuery());
         return Ok(collections);
     }
-    
+
     [Authorize]
     [HttpPost("{id}/like")]
     public async Task<IActionResult> ToggleLike(Guid id)
     {
         var isLiked = await _mediator.Send(new ToggleMovieCollectionLikeCommand
         {
-            MovieCollectionId = id,
-            UserId = _currentUserService.UserId
+            MovieCollectionId = id
         });
 
         return Ok(new { IsLiked = isLiked });

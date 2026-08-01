@@ -30,7 +30,6 @@ public class ReadingProgressController : ControllerBase
         {
             BookId = bookId,
             PercentageComplete = percentageComplete,
-            UserId = _currentUserService.UserId
         });
 
         return NoContent();

@@ -10,15 +10,19 @@ namespace WebApi.Application.Features.Reviews.Commands.ToggleReviewLike;
 public class ToggleReviewLikeCommandHandler : IRequestHandler<ToggleReviewLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleReviewLikeCommandHandler(IAppDbContext context)
+    public ToggleReviewLikeCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleReviewLikeCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var review = await _context.Reviews
@@ -28,14 +32,14 @@ public class ToggleReviewLikeCommandHandler : IRequestHandler<ToggleReviewLikeCo
             throw new NotFoundException("Rəy tapılmadı.");
 
         var existing = await _context.ReviewLikes.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.ReviewId == request.ReviewId,
+            x => x.UserId == currentUserId && x.ReviewId == request.ReviewId,
             cancellationToken);
 
         if (existing is null)
         {
             var like = new ReviewLike
             {
-                UserId = request.UserId,
+                UserId = currentUserId,
                 ReviewId = request.ReviewId,
                 Choice = request.Choice
             };
@@ -63,7 +67,7 @@ public class ToggleReviewLikeCommandHandler : IRequestHandler<ToggleReviewLikeCo
             await _context.SaveChangesAsync(cancellationToken);
             return false;
         }
-        
+
         if (existing.Choice == ReviewLikeChoice.Like)
         {
             review.Likes = Math.Max(0, review.Likes - 1);

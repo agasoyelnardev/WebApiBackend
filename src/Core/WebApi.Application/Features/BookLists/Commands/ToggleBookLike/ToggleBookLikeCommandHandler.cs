@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.BookLists.Commands.ToggleBookLike;
 public class ToggleBookLikeCommandHandler : IRequestHandler<ToggleBookLikeCommand, bool>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ToggleBookLikeCommandHandler(IAppDbContext context)
+    public ToggleBookLikeCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ToggleBookLikeCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var book = await _context.Books
@@ -27,7 +31,7 @@ public class ToggleBookLikeCommandHandler : IRequestHandler<ToggleBookLikeComman
             throw new NotFoundException("Kitab tapılmadı.");
 
         var existing = await _context.BookLikes.FirstOrDefaultAsync(
-            x => x.UserId == request.UserId && x.BookId == request.BookId,
+            x => x.UserId == currentUserId && x.BookId == request.BookId,
             cancellationToken);
 
         if (existing is not null)
@@ -40,7 +44,7 @@ public class ToggleBookLikeCommandHandler : IRequestHandler<ToggleBookLikeComman
 
         var like = new BookLike
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             BookId = request.BookId
         };
 

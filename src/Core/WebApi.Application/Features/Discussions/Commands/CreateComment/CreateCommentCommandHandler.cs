@@ -9,15 +9,19 @@ namespace WebApi.Application.Features.Discussions.Commands.CreateComment;
 public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand, Guid>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService; 
 
-    public CreateCommentCommandHandler(IAppDbContext context)
+    public CreateCommentCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateCommentCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.AuthorId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Content))
@@ -36,7 +40,7 @@ public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand,
         {
             DiscussionId = request.DiscussionId,
             Content = request.Content,
-            AuthorId = request.AuthorId
+            AuthorId = currentUserId   // ← dəyişdi
         };
 
         await _context.Comments.AddAsync(comment, cancellationToken);

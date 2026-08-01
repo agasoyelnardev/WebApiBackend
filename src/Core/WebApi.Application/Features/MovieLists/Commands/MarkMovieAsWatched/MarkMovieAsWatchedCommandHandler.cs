@@ -10,16 +10,23 @@ public class MarkMovieAsWatchedCommandHandler : IRequestHandler<MarkMovieAsWatch
 {
     private readonly IAppDbContext _context;
     private readonly IPointsService _pointsService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public MarkMovieAsWatchedCommandHandler(IAppDbContext context, IPointsService pointsService)
+    public MarkMovieAsWatchedCommandHandler(
+        IAppDbContext context,
+        IPointsService pointsService,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _pointsService = pointsService;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(MarkMovieAsWatchedCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var movieExists = await _context.Movies
@@ -29,21 +36,21 @@ public class MarkMovieAsWatchedCommandHandler : IRequestHandler<MarkMovieAsWatch
             throw new NotFoundException("Film tapılmadı.");
 
         var alreadyWatched = await _context.WatchHistories.AnyAsync(
-            x => x.UserId == request.UserId && x.MovieId == request.MovieId,
+            x => x.UserId == currentUserId && x.MovieId == request.MovieId,
             cancellationToken);
 
         if (alreadyWatched)
-            return; 
+            return;
 
         var history = new WatchHistory
         {
-            UserId = request.UserId,
+            UserId = currentUserId,
             MovieId = request.MovieId
         };
 
         await _context.WatchHistories.AddAsync(history, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        await _pointsService.AwardPointsAsync(request.UserId, PointAction.WatchMovie, cancellationToken);
+        await _pointsService.AwardPointsAsync(currentUserId, PointAction.WatchMovie, cancellationToken);
     }
 }

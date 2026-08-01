@@ -6,25 +6,31 @@ using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.Rooms.Commands;
 
+
 public class TransferHostCommandHandler : IRequestHandler<TransferHostCommand>
 {
     private readonly IChatRepository _repository;
     private readonly IRoomPresenceService _presenceService;
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly ICurrentUserService _currentUserService;  
 
     public TransferHostCommandHandler(
         IChatRepository repository,
         IRoomPresenceService presenceService,
-        IHubContext<ChatHub> hubContext)
+        IHubContext<ChatHub> hubContext,
+        ICurrentUserService currentUserService)
     {
         _repository = repository;
         _presenceService = presenceService;
         _hubContext = hubContext;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(TransferHostCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var room = await _repository.GetRoomByIdAsync(request.RoomId);
@@ -32,10 +38,10 @@ public class TransferHostCommandHandler : IRequestHandler<TransferHostCommand>
         if (room is null)
             throw new NotFoundException("Otaq tapılmadı.");
 
-        if (room.CreatedByUserId != request.RequestedByUserId)
+        if (room.CreatedByUserId != currentUserId)   
             throw new UnauthorizedAccessException("Yalnız otaq sahibi host statusunu ötürə bilər.");
 
-        if (request.NewHostUserId == request.RequestedByUserId)
+        if (request.NewHostUserId == currentUserId)  
             throw new BadRequestException("Artıq siz bu otağın sahibisiniz.");
 
         var isCurrentlyInRoom = _presenceService.IsUserInRoom(request.RoomId.ToString(), request.NewHostUserId);

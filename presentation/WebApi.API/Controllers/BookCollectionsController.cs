@@ -32,7 +32,6 @@ public class BookCollectionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateBookCollectionCommand command)
     {
-        command.UserId = _currentUserService.UserId;
         var id = await _mediator.Send(command);
         return Ok(id);
     }
@@ -42,7 +41,6 @@ public class BookCollectionsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateBookCollectionCommand command)
     {
         command.Id = id;
-        command.RequestedByUserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -51,10 +49,7 @@ public class BookCollectionsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteBookCollectionCommand(id)
-        {
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteBookCollectionCommand(id));
         return NoContent();
     }
 
@@ -66,7 +61,6 @@ public class BookCollectionsController : ControllerBase
         {
             BookCollectionId = id,
             BookId = bookId,
-            RequestedByUserId = _currentUserService.UserId
         });
         return Ok(new { Message = "Kitab kolleksiyaya əlavə edildi" });
     }
@@ -79,7 +73,6 @@ public class BookCollectionsController : ControllerBase
         {
             BookCollectionId = id,
             BookId = bookId,
-            RequestedByUserId = _currentUserService.UserId
         });
         return Ok(new { Message = "Kitab kolleksiyadan çıxarıldı" });
     }
@@ -109,7 +102,6 @@ public class BookCollectionsController : ControllerBase
         var isLiked = await _mediator.Send(new ToggleBookCollectionLikeCommand
         {
             BookCollectionId = id,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsLiked = isLiked });
@@ -122,7 +114,6 @@ public class BookCollectionsController : ControllerBase
         var isSaved = await _mediator.Send(new ToggleSaveBookCollectionCommand
         {
             BookCollectionId = id,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsSaved = isSaved });

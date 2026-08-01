@@ -32,7 +32,6 @@ public class MovieListsController : ControllerBase
         var isFavorite = await _mediator.Send(new ToggleFavoriteCommand
         {
             MovieId = movieId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsFavorite = isFavorite });
@@ -56,7 +55,6 @@ public class MovieListsController : ControllerBase
         var isInWatchlist = await _mediator.Send(new ToggleWatchlistCommand
         {
             MovieId = movieId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsInWatchlist = isInWatchlist });
@@ -80,7 +78,6 @@ public class MovieListsController : ControllerBase
         var isLiked = await _mediator.Send(new ToggleMovieLikeCommand
         {
             MovieId = movieId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsLiked = isLiked });
@@ -92,7 +89,6 @@ public class MovieListsController : ControllerBase
         await _mediator.Send(new MarkMovieAsWatchedCommand
         {
             MovieId = movieId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { Message = "İzləməyə başladınız" });

@@ -39,10 +39,7 @@ public class SocialController : ControllerBase
             return Unauthorized();
 
         await _mediator.Send(
-            new FollowUserCommand(userId)
-            {
-                FollowerUserId = _currentUserService.UserId
-            });
+            new FollowUserCommand(userId));
 
         return Ok(new { Message = "İstifadəçi izlənildi" });
     }
@@ -54,10 +51,7 @@ public class SocialController : ControllerBase
             return Unauthorized();
 
         await _mediator.Send(
-            new UnfollowUserCommand(userId)
-            {
-                FollowerUserId = _currentUserService.UserId
-            });
+            new UnfollowUserCommand(userId));
 
         return Ok(new { Message = "İzləmədən çıxarıldı" });
     }
@@ -103,10 +97,7 @@ public class SocialController : ControllerBase
             return Unauthorized();
 
         await _mediator.Send(
-            new SendFriendRequestCommand(userId)
-            {
-                SenderId = _currentUserService.UserId
-            });
+            new SendFriendRequestCommand(userId));
 
         return Ok(new { Message = "Dostluq sorğusu göndərildi" });
     }
@@ -118,10 +109,7 @@ public class SocialController : ControllerBase
             return Unauthorized();
 
         await _mediator.Send(
-            new AcceptFriendRequestCommand(friendshipId)
-            {
-                UserId = _currentUserService.UserId
-            });
+            new AcceptFriendRequestCommand(friendshipId) { });
 
         return Ok(new { Message = "Dostluq sorğusu qəbul edildi" });
     }
@@ -129,16 +117,13 @@ public class SocialController : ControllerBase
     [HttpPut("friend-request/{friendshipId}/decline")]
     public async Task<IActionResult> DeclineFriendRequest(Guid friendshipId)
     {
-        if (_currentUserService.UserId is null)
-            return Unauthorized();
-
         await _mediator.Send(
-            new DeclineFriendRequestCommand(friendshipId)
-            {
-                UserId = _currentUserService.UserId
-            });
+            new DeclineFriendRequestCommand(friendshipId));
 
-        return Ok(new { Message = "Dostluq sorğusu rədd edildi" });
+        return Ok(new 
+        { 
+            Message = "Dostluq sorğusu rədd edildi" 
+        });
     }
     
     [HttpDelete("friend/{userId}")]
@@ -148,10 +133,7 @@ public class SocialController : ControllerBase
             return Unauthorized();
 
         await _mediator.Send(
-            new RemoveFriendCommand(userId)
-            {
-                CurrentUserId = _currentUserService.UserId
-            });
+            new RemoveFriendCommand(userId));
 
         return Ok(new { Message = "Dostluq silindi" });
     }

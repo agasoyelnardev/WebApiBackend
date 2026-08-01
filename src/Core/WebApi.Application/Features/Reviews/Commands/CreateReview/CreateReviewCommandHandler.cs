@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Events;

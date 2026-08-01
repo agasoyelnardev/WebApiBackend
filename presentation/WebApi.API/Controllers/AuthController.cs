@@ -68,7 +68,6 @@ public class AuthController : ControllerBase
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(ChangePasswordCommand command)
     {
-        command.UserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return Ok(new { Message = "Şifrə uğurla dəyişdirildi." });
     }

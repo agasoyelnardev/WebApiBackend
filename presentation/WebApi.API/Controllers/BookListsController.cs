@@ -31,7 +31,6 @@ public class BookListsController : ControllerBase
         var isFavorite = await _mediator.Send(new ToggleBookFavoriteCommand
         {
             BookId = bookId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsFavorite = isFavorite });
@@ -50,7 +49,6 @@ public class BookListsController : ControllerBase
         var isLiked = await _mediator.Send(new ToggleBookLikeCommand
         {
             BookId = bookId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsLiked = isLiked });
@@ -62,7 +60,6 @@ public class BookListsController : ControllerBase
         var isInWatchlist = await _mediator.Send(new ToggleBookWatchlistCommand
         {
             BookId = bookId,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsInWatchlist = isInWatchlist });

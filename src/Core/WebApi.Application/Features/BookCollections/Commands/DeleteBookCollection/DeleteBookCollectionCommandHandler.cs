@@ -20,7 +20,9 @@ public class DeleteBookCollectionCommandHandler : IRequestHandler<DeleteBookColl
 
     public async Task Handle(DeleteBookCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.BookCollections
@@ -31,7 +33,7 @@ public class DeleteBookCollectionCommandHandler : IRequestHandler<DeleteBookColl
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (collection.UserId != request.RequestedByUserId && !isAdmin)
+        if (collection.UserId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu kolleksiyanı silmək hüququnuz yoxdur.");
 
         var items = await _context.BookCollectionItems

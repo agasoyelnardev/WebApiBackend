@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.Discussions.Commands.CreateDiscussion;
 public class CreateDiscussionCommandHandler : IRequestHandler<CreateDiscussionCommand, Guid>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public CreateDiscussionCommandHandler(IAppDbContext context)
+    public CreateDiscussionCommandHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateDiscussionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.AuthorId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.Title))
@@ -36,7 +40,7 @@ public class CreateDiscussionCommandHandler : IRequestHandler<CreateDiscussionCo
             Title = request.Title,
             Content = request.Content,
             Category = request.Category,
-            AuthorId = request.AuthorId
+            AuthorId = currentUserId
         };
 
         await _context.Discussions.AddAsync(discussion, cancellationToken);

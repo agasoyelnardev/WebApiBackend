@@ -8,15 +8,19 @@ namespace WebApi.Application.Features.MovieCollections.Commands.RemoveMovieFromC
 public class RemoveMovieFromCollectionCommandHandler : IRequestHandler<RemoveMovieFromCollectionCommand>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public RemoveMovieFromCollectionCommandHandler(IAppDbContext context)
+    public RemoveMovieFromCollectionCommandHandler(
+        IAppDbContext context,
+        ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task Handle(RemoveMovieFromCollectionCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        if (string.IsNullOrEmpty(_currentUserService.UserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var collection = await _context.MovieCollections
@@ -25,7 +29,7 @@ public class RemoveMovieFromCollectionCommandHandler : IRequestHandler<RemoveMov
         if (collection is null)
             throw new NotFoundException("Kolleksiya tapılmadı.");
 
-        if (collection.AppUserId != request.RequestedByUserId)
+        if (collection.AppUserId != _currentUserService.UserId)
             throw new UnauthorizedAccessException("Bu kolleksiyadan film çıxarmaq hüququnuz yoxdur.");
 
         var item = await _context.MovieCollectionItems

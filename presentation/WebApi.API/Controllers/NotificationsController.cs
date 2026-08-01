@@ -58,7 +58,6 @@ public class NotificationsController : ControllerBase
         await _mediator.Send(new ToggleNotificationReadCommand
         {
             Id = id,
-            UserId = _currentUserService.UserId
         });
 
         return NoContent();
@@ -67,10 +66,7 @@ public class NotificationsController : ControllerBase
     [HttpPut("mark-all-read")]
     public async Task<IActionResult> MarkAllAsRead()
     {
-        await _mediator.Send(new MarkAllNotificationsAsReadCommand
-        {
-            UserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new MarkAllNotificationsAsReadCommand { });
 
         return NoContent();
     }
@@ -81,7 +77,6 @@ public class NotificationsController : ControllerBase
         await _mediator.Send(new DeleteNotificationCommand
         {
             Id = id,
-            UserId = _currentUserService.UserId
         });
 
         return NoContent();

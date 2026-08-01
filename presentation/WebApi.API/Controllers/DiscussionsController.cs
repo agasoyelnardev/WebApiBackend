@@ -59,7 +59,6 @@ public class DiscussionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateDiscussionCommand command)
     {
-        command.AuthorId = _currentUserService.UserId;
         var id = await _mediator.Send(command);
         return Ok(id);
     }
@@ -69,7 +68,6 @@ public class DiscussionsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, UpdateDiscussionCommand command)
     {
         command.Id = id;
-        command.RequestedByUserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -81,7 +79,6 @@ public class DiscussionsController : ControllerBase
         await _mediator.Send(new DeleteDiscussionCommand
         {
             Id = id,
-            RequestedByUserId = _currentUserService.UserId
         });
         return NoContent();
     }
@@ -93,7 +90,6 @@ public class DiscussionsController : ControllerBase
         var isLiked = await _mediator.Send(new ToggleDiscussionLikeCommand
         {
             DiscussionId = id,
-            UserId = _currentUserService.UserId
         });
 
         return Ok(new { IsLiked = isLiked });
@@ -107,7 +103,6 @@ public class DiscussionsController : ControllerBase
         {
             DiscussionId = id,
             Content = content,
-            AuthorId = _currentUserService.UserId
         });
 
         return Ok(commentId);
@@ -120,7 +115,6 @@ public class DiscussionsController : ControllerBase
         await _mediator.Send(new DeleteCommentCommand
         {
             Id = commentId,
-            RequestedByUserId = _currentUserService.UserId
         });
 
         return NoContent();

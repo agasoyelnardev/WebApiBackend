@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Hubs;
 using WebApi.Application.Interfaces;
@@ -11,16 +12,26 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Gui
 {
     private readonly IChatRepository _repository;
     private readonly IHubContext<ChatHub> _hubContext;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IAppDbContext _context;   
 
-    public SendMessageCommandHandler(IChatRepository repository, IHubContext<ChatHub> hubContext)
+    public SendMessageCommandHandler(
+        IChatRepository repository,
+        IHubContext<ChatHub> hubContext,
+        ICurrentUserService currentUserService,
+        IAppDbContext context)
     {
         _repository = repository;
         _hubContext = hubContext;
+        _currentUserService = currentUserService;
+        _context = context;
     }
 
     public async Task<Guid> Handle(SendMessageCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.UserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         if (string.IsNullOrWhiteSpace(request.MessageText))
@@ -36,20 +47,24 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Gui
         if (!room.IsLive)
             throw new BadRequestException("Bağlı otağa mesaj göndərilə bilməz.");
 
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == currentUserId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("İstifadəçi tapılmadı.");
+
         var message = new ChatMessage
         {
             Id = Guid.NewGuid(),
             StreamRoomId = request.RoomId,
-            UserId = request.UserId,
-            Username = request.Username,
-            UserAvatarUrl = request.UserAvatarUrl,
+            UserId = currentUserId,
+            Username = user.UserName ?? "Naməlum",
+            UserAvatarUrl = user.Avatar,
             MessageText = request.MessageText,
             IsSystemMessage = false
         };
 
         await _repository.AddMessageAsync(message);
         await _repository.SaveChangesAsync();
-        
+
         await _hubContext.Clients.Group(request.RoomId.ToString())
             .SendAsync("ReceiveMessage", new
             {

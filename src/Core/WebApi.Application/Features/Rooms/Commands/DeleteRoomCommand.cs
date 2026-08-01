@@ -6,7 +6,6 @@ namespace WebApi.Application.Features.Rooms.Commands;
 
 public record DeleteRoomCommand(Guid RoomId) : IRequest<Unit>
 {
-    public string RequestedByUserId { get; set; } = string.Empty;
 }
 
 public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand, Unit>
@@ -22,7 +21,9 @@ public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand, Unit>
 
     public async Task<Unit> Handle(DeleteRoomCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(request.RequestedByUserId))
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
             throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
 
         var room = await _repository.GetRoomByIdAsync(request.RoomId);
@@ -32,7 +33,7 @@ public class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand, Unit>
 
         var isAdmin = _currentUserService.IsInRole("Admin");
 
-        if (room.CreatedByUserId != request.RequestedByUserId && !isAdmin)
+        if (room.CreatedByUserId != currentUserId && !isAdmin)   
             throw new UnauthorizedAccessException("Bu otağı silmək icazəniz yoxdur");
 
         await _repository.DeleteRoomAsync(room);

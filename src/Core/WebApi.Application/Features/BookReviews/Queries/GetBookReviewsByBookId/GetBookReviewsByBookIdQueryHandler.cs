@@ -20,14 +20,17 @@ public class GetBookReviewsByBookIdQueryHandler
     {
         return await _context.BookReviews
             .Where(r => r.BookId == request.BookId)
+            .OrderByDescending(r => r.CreatedAt)
             .Select(r => new BookReviewDto
             {
                 Id = r.Id,
                 Author = r.User.UserName ?? "Unknown",
+                UserAvatar = r.User.Avatar,
                 Rating = r.Rating,
                 Comment = r.Comment,
                 Likes = r.Likes,
-                Dislikes = r.Dislikes
+                Dislikes = r.Dislikes,
+                CreatedAt = r.CreatedAt
             })
             .ToListAsync(cancellationToken);
     }

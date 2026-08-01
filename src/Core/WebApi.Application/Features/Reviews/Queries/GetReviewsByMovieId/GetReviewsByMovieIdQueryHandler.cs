@@ -20,9 +20,10 @@ public class GetReviewsByMovieIdQueryHandler
     {
         return await _context.Reviews
             .Where(r => r.MovieId == request.MovieId && !r.IsDeleted)
+            .OrderByDescending(r => r.CreatedAt)
             .Select(r => new ReviewDto
             {
-                Id =  r.Id,
+                Id = r.Id,
                 MovieId = r.MovieId,
                 MovieTitle = r.Movie.Title,
                 UserId = r.UserId,
@@ -30,8 +31,8 @@ public class GetReviewsByMovieIdQueryHandler
                 UserAvatar = r.User.Avatar,
                 Rating = r.Rating,
                 Comment = r.Content,
-                Likes = 0,
-                Dislikes = 0,
+                Likes = r.Likes,       
+                Dislikes = r.Dislikes,
                 CreatedAt = r.CreatedAt
             })
             .ToListAsync(cancellationToken);

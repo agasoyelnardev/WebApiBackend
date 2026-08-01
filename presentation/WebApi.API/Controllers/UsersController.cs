@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Users.Commands.DeleteUser;
 using WebApi.Application.Features.Users.Commands.SetUserRole;
@@ -10,8 +9,6 @@ using WebApi.Application.Features.Users.Commands.UpdateProfile;
 using WebApi.Application.Features.Users.Dtos;
 using WebApi.Application.Features.Users.Queries.GetAllUsers;
 using WebApi.Application.Features.Users.Queries.GetUserProfile;
-using WebApi.Application.Interfaces;
-using WebApi.Domain.Entities;
 
 namespace WebApi.API.Controllers;
 
@@ -20,14 +17,9 @@ namespace WebApi.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly UserManager<AppUser> _userManager;
-
-    public UsersController(IMediator mediator, ICurrentUserService currentUserService, UserManager<AppUser> userManager)
+    public UsersController(IMediator mediator)
     {
         _mediator = mediator;
-        _currentUserService = currentUserService;
-        _userManager = userManager;
     }
 
     [HttpGet("{id}")]
@@ -45,7 +37,6 @@ public class UsersController : ControllerBase
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateProfile(UpdateProfileCommand command)
     {
-        command.UserId = _currentUserService.UserId;
         await _mediator.Send(command);
         return NoContent();
     }
@@ -77,11 +68,7 @@ public class UsersController : ControllerBase
     [HttpDelete("{userId}")]
     public async Task<IActionResult> DeleteUser(string userId)
     {
-        await _mediator.Send(new DeleteUserCommand
-        {
-            UserId = userId,
-            RequestedByUserId = _currentUserService.UserId
-        });
+        await _mediator.Send(new DeleteUserCommand(userId));
 
         return NoContent();
     }

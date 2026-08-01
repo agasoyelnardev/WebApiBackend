@@ -9,17 +9,24 @@ public class GetSavedBookCollectionsQueryHandler
     : IRequestHandler<GetSavedBookCollectionsQuery, List<BookCollectionDto>>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetSavedBookCollectionsQueryHandler(IAppDbContext context)
+    public GetSavedBookCollectionsQueryHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<List<BookCollectionDto>> Handle(
         GetSavedBookCollectionsQuery request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         return await _context.SavedBookCollections
-            .Where(x => x.UserId == request.UserId)
+            .Where(x => x.UserId == currentUserId)
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new BookCollectionDto
             {

@@ -9,16 +9,23 @@ public class GetUserBookWatchlistQueryHandler
     : IRequestHandler<GetUserBookWatchlistQuery, List<BookDto>>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetUserBookWatchlistQueryHandler(IAppDbContext context)
+    public GetUserBookWatchlistQueryHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<List<BookDto>> Handle(GetUserBookWatchlistQuery request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         return await _context.UserBookWatchlistItems
-            .Where(x => x.UserId == request.UserId && !x.Book.IsDeleted)
+            .Where(x => x.UserId == currentUserId && !x.Book.IsDeleted)
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new BookDto
             {

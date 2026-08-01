@@ -20,8 +20,8 @@ public class AiChatController : ControllerBase
     [HttpPost("ask")]
     public async Task<IActionResult> Ask([FromBody] AskAiChatRequest request)
     {
-        var reply = await _mediator.Send(new AskAiChatCommand(request.Message));
-        return Ok(new { reply });
+        var response = await _mediator.Send(new AskAiChatCommand(request.Message));
+        return Ok(response);
     }
 }
 

@@ -6,7 +6,6 @@ using WebApi.Application.Features.BookLists.Commands.ToggleBookLike;
 using WebApi.Application.Features.BookLists.Commands.ToggleBookWatchlist;
 using WebApi.Application.Features.BookLists.Queries.GetUserBookFavorites;
 using WebApi.Application.Features.BookLists.Queries.GetUserBookWatchlist;
-using WebApi.Application.Features.MovieLists.Queries.GetWatchHistory;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.API.Controllers;

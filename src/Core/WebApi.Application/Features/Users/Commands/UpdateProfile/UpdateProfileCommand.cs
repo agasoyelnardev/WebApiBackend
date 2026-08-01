@@ -8,5 +8,4 @@ public class UpdateProfileCommand : IRequest
     public string Avatar { get; set; } = string.Empty;
     public string Bio { get; set; } = string.Empty;
 
-    public string UserId { get; set; } = string.Empty;
 }

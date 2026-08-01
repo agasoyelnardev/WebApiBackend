@@ -9,16 +9,23 @@ public class GetUserBookFavoritesQueryHandler
     : IRequestHandler<GetUserBookFavoritesQuery, List<BookDto>>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetUserBookFavoritesQueryHandler(IAppDbContext context)
+    public GetUserBookFavoritesQueryHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<List<BookDto>> Handle(GetUserBookFavoritesQuery request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         return await _context.UserBookFavorites
-            .Where(x => x.UserId == request.UserId && !x.Book.IsDeleted)
+            .Where(x => x.UserId == currentUserId && !x.Book.IsDeleted)
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new BookDto
             {

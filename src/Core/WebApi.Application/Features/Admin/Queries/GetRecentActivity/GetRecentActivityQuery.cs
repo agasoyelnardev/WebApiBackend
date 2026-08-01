@@ -1,4 +1,3 @@
-// GetRecentActivityQuery.cs
 using MediatR;
 using WebApi.Application.Features.Admin.Dtos;
 

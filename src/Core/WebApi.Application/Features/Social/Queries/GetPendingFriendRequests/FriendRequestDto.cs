@@ -1,4 +1,4 @@
-namespace WebApi.Application.Features.Social.Queries;
+namespace WebApi.Application.Features.Social.Queries.GetPendingFriendRequests;
 
 public record FriendRequestDto(
     Guid Id,

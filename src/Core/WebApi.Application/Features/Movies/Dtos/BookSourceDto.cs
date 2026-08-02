@@ -1,4 +1,4 @@
-namespace WebApi.Application.Features.Movies.Queries.GetMovieById;
+namespace WebApi.Application.Features.Movies.Dtos;
 
 public class BookSourceDto
 {

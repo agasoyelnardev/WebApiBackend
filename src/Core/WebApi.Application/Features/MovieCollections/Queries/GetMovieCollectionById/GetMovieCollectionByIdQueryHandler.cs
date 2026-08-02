@@ -1,6 +1,5 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using WebApi.Application.Common.Exceptions;
 using WebApi.Application.Features.MovieCollections.Dtos;
 using WebApi.Application.Interfaces;
 

@@ -3,7 +3,6 @@ using WebApi.Application.Features.BookCollections.Dtos;
 using WebApi.Application.Features.Discussions.Dtos;
 using WebApi.Application.Features.MovieCollections.Dtos;
 using WebApi.Application.Features.Movies.Dtos;
-using WebApi.Application.Features.Movies.Queries.GetMovieById;
 
 namespace WebApi.Application.Features.Search.Dtos;
 

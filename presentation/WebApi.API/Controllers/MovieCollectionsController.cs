@@ -27,7 +27,7 @@ public class MovieCollectionsController : ControllerBase
         _mediator = mediator;
         _currentUserService = currentUserService;
     }
-
+ 
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(CreateMovieCollectionCommand command)

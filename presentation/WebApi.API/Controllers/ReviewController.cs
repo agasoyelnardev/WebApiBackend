@@ -7,7 +7,6 @@ using WebApi.Application.Features.Reviews.Commands.ToggleReviewLike;
 using WebApi.Application.Features.Reviews.Commands.UpdateReview;
 using WebApi.Application.Features.Reviews.Queries.GetReviewsByMovieId;
 using WebApi.Application.Interfaces;
-using WebApi.Domain.Entities;
 using WebApi.Domain.Enums;
 
 namespace WebApi.API.Controllers;

@@ -29,6 +29,7 @@ public class MoviesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<MovieDto>>> GetFiltered([FromQuery] GetFilteredMoviesQuery query)
     {
+        query.RequestingUserId = _currentUserService.UserId;
         var movies = await _mediator.Send(query);
         return Ok(movies);
     }

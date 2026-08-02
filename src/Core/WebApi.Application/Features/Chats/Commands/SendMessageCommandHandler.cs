@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Common.Exceptions;
+using WebApi.Application.Features.Chats.Queries;
 using WebApi.Application.Hubs;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
@@ -13,7 +14,7 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Gui
     private readonly IChatRepository _repository;
     private readonly IHubContext<ChatHub> _hubContext;
     private readonly ICurrentUserService _currentUserService;
-    private readonly IAppDbContext _context;   
+    private readonly IAppDbContext _context;
 
     public SendMessageCommandHandler(
         IChatRepository repository,
@@ -65,15 +66,17 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Gui
         await _repository.AddMessageAsync(message);
         await _repository.SaveChangesAsync();
 
+        var dto = new ChatMessageDto(
+            message.Id,
+            message.UserId,
+            message.Username,
+            message.UserAvatarUrl,
+            message.MessageText,
+            message.IsSystemMessage,
+            message.CreatedAt);
+
         await _hubContext.Clients.Group(request.RoomId.ToString())
-            .SendAsync("ReceiveMessage", new
-            {
-                message.Id,
-                message.UserId,
-                message.Username,
-                message.UserAvatarUrl,
-                message.MessageText
-            }, cancellationToken);
+            .SendAsync("ReceiveMessage", dto, cancellationToken);
 
         return message.Id;
     }

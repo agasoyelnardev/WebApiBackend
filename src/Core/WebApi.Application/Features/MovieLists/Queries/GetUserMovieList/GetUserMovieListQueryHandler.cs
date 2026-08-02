@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Features.Movies.Dtos;
-using WebApi.Application.Features.Movies.Queries.GetMovieById;
 using WebApi.Application.Interfaces;
 
 namespace WebApi.Application.Features.MovieLists.Queries.GetUserMovieList;
@@ -10,16 +9,23 @@ public class GetUserMovieListQueryHandler
     : IRequestHandler<GetUserMovieListQuery, List<MovieDto>>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetUserMovieListQueryHandler(IAppDbContext context)
+    public GetUserMovieListQueryHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<List<MovieDto>> Handle(GetUserMovieListQuery request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         return await _context.UserMovieLists
-            .Where(x => x.UserId == request.UserId && x.Type == request.Type && !x.Movie.IsDeleted)
+            .Where(x => x.UserId == currentUserId && x.Type == request.Type && !x.Movie.IsDeleted)
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new MovieDto
             {

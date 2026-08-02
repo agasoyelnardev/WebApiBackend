@@ -1,4 +1,4 @@
-using WebApi.Application.Features.Notifications.Dtos;
+namespace WebApi.Application.Features.Notifications.Dtos;
 
 public class PagedNotificationsDto
 {

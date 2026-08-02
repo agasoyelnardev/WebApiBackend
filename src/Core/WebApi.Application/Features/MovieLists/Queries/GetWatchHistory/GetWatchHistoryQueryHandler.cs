@@ -8,16 +8,23 @@ namespace WebApi.Application.Features.MovieLists.Queries.GetWatchHistory;
 public class GetWatchHistoryQueryHandler : IRequestHandler<GetWatchHistoryQuery, List<MovieDto>>
 {
     private readonly IAppDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetWatchHistoryQueryHandler(IAppDbContext context)
+    public GetWatchHistoryQueryHandler(IAppDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<List<MovieDto>> Handle(GetWatchHistoryQuery request, CancellationToken cancellationToken)
     {
+        var currentUserId = _currentUserService.UserId;
+
+        if (string.IsNullOrEmpty(currentUserId))
+            throw new UnauthorizedAccessException("İstifadəçi səlahiyyəti yoxdur.");
+
         return await _context.WatchHistories
-            .Where(x => x.UserId == request.UserId && !x.Movie.IsDeleted)
+            .Where(x => x.UserId == currentUserId && !x.Movie.IsDeleted)
             .OrderByDescending(x => x.CreatedAt)
             .Select(x => new MovieDto
             {

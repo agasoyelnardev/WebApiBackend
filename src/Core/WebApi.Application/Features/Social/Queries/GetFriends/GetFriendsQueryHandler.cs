@@ -1,9 +1,10 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Application.Features.Social.Query.GetFriends;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Enums;
 
-namespace WebApi.Application.Features.Social.Query.GetFriends;
+namespace WebApi.Application.Features.Social.Queries.GetFriends;
 
 public class GetFriendsQueryHandler
     : IRequestHandler<GetFriendsQuery, List<FriendDto>>

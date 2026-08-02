@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Application.Features.Movies.Dtos;
+using WebApi.Application.Features.Movies.Queries.GetMovieById;
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 
@@ -99,6 +100,17 @@ public class GetFilteredMoviesQueryHandler : IRequestHandler<GetFilteredMoviesQu
                 Cast = m.Cast,
                 Likes = m.Likes,
                 ExternalUrl = m.ExternalUrl,
+                IsLikedByCurrentUser = request.RequestingUserId != null &&
+                                       _context.MovieLikes.Any(l => l.MovieId == m.Id && l.UserId == request.RequestingUserId),
+                BookSource = m.BookSource != null && !m.BookSource.IsDeleted
+                    ? new BookSourceDto
+                    {
+                        Id = m.BookSource.Id,
+                        Title = m.BookSource.Title,
+                        Author = m.BookSource.Author,
+                        Cover = m.BookSource.Cover
+                    }
+                    : null
             })
             .ToListAsync(cancellationToken);
     }

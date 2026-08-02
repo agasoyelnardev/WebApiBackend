@@ -1,4 +1,4 @@
-namespace WebApi.Application.Features.Social.Query.GetFriends;
+namespace WebApi.Application.Features.Social.Queries.GetFriends;
 
 public record FriendDto(
     string Id,

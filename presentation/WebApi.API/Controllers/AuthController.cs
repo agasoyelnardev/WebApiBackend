@@ -2,7 +2,9 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using WebApi.Application.Features.Auth.Commands;
 using WebApi.Application.Features.Auth.Commands.ChangePassword;
+using WebApi.Application.Features.Auth.Commands.ExternalLogin;
 using WebApi.Application.Features.Auth.Commands.Login;
 using WebApi.Application.Features.Auth.Commands.Register;
 using WebApi.Application.Features.Auth.Commands.RefreshToken;
@@ -70,5 +72,14 @@ public class AuthController : ControllerBase
     {
         await _mediator.Send(command);
         return Ok(new { Message = "Şifrə uğurla dəyişdirildi." });
+    }
+    
+    [HttpPost("external-login")]
+    public async Task<ActionResult<AuthResultDto>> ExternalLogin(
+        [FromBody] ExternalLoginCommand command,
+        CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return Ok(result);
     }
 }

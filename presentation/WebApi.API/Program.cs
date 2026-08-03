@@ -27,6 +27,8 @@ builder.Services.AddHttpClient<IBookImportService, GoogleBooksImportService>();
 builder.Services.AddHttpClient<IAiChatService, GeminiChatService>();
 builder.Services.AddSingleton<IOnlineUsersTracker, OnlineUsersTracker>();
 
+
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {

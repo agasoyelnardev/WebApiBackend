@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "mi0fmtNZ0t4=",
+  "dgSpecHash": "X0isKZEf8QI=",
   "success": true,
   "projectFilePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
   "expectedPackageFiles": [
@@ -16,7 +16,7 @@
     "/Users/peyman/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/10.0.0/microsoft.aspnetcore.cryptography.keyderivation.10.0.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.0/microsoft.aspnetcore.identity.entityframeworkcore.10.0.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.bcl.asyncinterfaces/8.0.0/microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.bcl.cryptography/9.0.4/microsoft.bcl.cryptography.9.0.4.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/microsoft.bcl.cryptography/10.0.2/microsoft.bcl.cryptography.10.0.2.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.build/17.7.2/microsoft.build.17.7.2.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.build.framework/17.14.28/microsoft.build.framework.17.14.28.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.build.tasks.core/17.14.28/microsoft.build.tasks.core.17.14.28.nupkg.sha512",
@@ -50,12 +50,12 @@
     "/Users/peyman/.nuget/packages/microsoft.extensions.primitives/10.0.0/microsoft.extensions.primitives.10.0.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identity.client/4.73.1/microsoft.identity.client.4.73.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identity.client.extensions.msal/4.73.1/microsoft.identity.client.extensions.msal.4.73.1.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.identitymodel.abstractions/8.14.0/microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.14.0/microsoft.identitymodel.jsonwebtokens.8.14.0.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.identitymodel.logging/8.14.0/microsoft.identitymodel.logging.8.14.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/microsoft.identitymodel.abstractions/8.19.1/microsoft.identitymodel.abstractions.8.19.1.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.19.1/microsoft.identitymodel.jsonwebtokens.8.19.1.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/microsoft.identitymodel.logging/8.19.1/microsoft.identitymodel.logging.8.19.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identitymodel.protocols/7.7.1/microsoft.identitymodel.protocols.7.7.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.identitymodel.protocols.openidconnect/7.7.1/microsoft.identitymodel.protocols.openidconnect.7.7.1.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/microsoft.identitymodel.tokens/8.19.1/microsoft.identitymodel.tokens.8.19.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.net.stringtools/17.14.28/microsoft.net.stringtools.17.14.28.nupkg.sha512",
     "/Users/peyman/.nuget/packages/microsoft.sqlserver.server/1.0.0/microsoft.sqlserver.server.1.0.0.nupkg.sha512",
     "/Users/peyman/.nuget/packages/mono.texttemplating/3.0.0/mono.texttemplating.3.0.0.nupkg.sha512",
@@ -71,7 +71,7 @@
     "/Users/peyman/.nuget/packages/system.configuration.configurationmanager/9.0.4/system.configuration.configurationmanager.9.0.4.nupkg.sha512",
     "/Users/peyman/.nuget/packages/system.diagnostics.eventlog/9.0.4/system.diagnostics.eventlog.9.0.4.nupkg.sha512",
     "/Users/peyman/.nuget/packages/system.formats.nrbf/9.0.0/system.formats.nrbf.9.0.0.nupkg.sha512",
-    "/Users/peyman/.nuget/packages/system.identitymodel.tokens.jwt/7.7.1/system.identitymodel.tokens.jwt.7.7.1.nupkg.sha512",
+    "/Users/peyman/.nuget/packages/system.identitymodel.tokens.jwt/8.19.1/system.identitymodel.tokens.jwt.8.19.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/system.management/7.0.2/system.management.7.0.2.nupkg.sha512",
     "/Users/peyman/.nuget/packages/system.memory.data/8.0.1/system.memory.data.8.0.1.nupkg.sha512",
     "/Users/peyman/.nuget/packages/system.reflection.metadataloadcontext/7.0.0/system.reflection.metadataloadcontext.7.0.0.nupkg.sha512",
@@ -86,7 +86,79 @@
     {
       "code": "NU1903",
       "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-23rf-6693-g89p",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
       "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-37gx-xxp4-5rgx",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-6588-8gv4-xfgh",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-8q5v-6pqq-x66h",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-cvvh-rhrc-wg4q",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-g8r8-53c2-pm3f",
+      "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "warningLevel": 1,
+      "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
+      "libraryId": "System.Security.Cryptography.Xml",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'System.Security.Cryptography.Xml' 9.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-mmjf-rqrv-855v",
       "projectPath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",
       "warningLevel": 1,
       "filePath": "/Users/peyman/Desktop/WebApi/src/Infrastructure/WebApi.Persistence/WebApi.Persistence.csproj",

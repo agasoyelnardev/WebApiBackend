@@ -1,5 +1,4 @@
-// AdminActivityLogger.cs
-using Microsoft.EntityFrameworkCore;
+
 using WebApi.Application.Interfaces;
 using WebApi.Domain.Entities;
 

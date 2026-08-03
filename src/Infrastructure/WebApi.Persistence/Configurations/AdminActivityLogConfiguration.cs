@@ -8,6 +8,10 @@ public class AdminActivityLogConfiguration : IEntityTypeConfiguration<AdminActiv
 {
     public void Configure(EntityTypeBuilder<AdminActivityLog> builder)
     {
+        builder.Property(x => x.AdminUserId)
+            .IsRequired()
+            .HasMaxLength(450); 
+
         builder.Property(x => x.AdminUsername)
             .IsRequired()
             .HasMaxLength(100);
@@ -23,12 +27,6 @@ public class AdminActivityLogConfiguration : IEntityTypeConfiguration<AdminActiv
         builder.Property(x => x.TargetEntityType)
             .HasMaxLength(50);
 
-        builder.HasOne(x => x.AdminUser)
-            .WithMany()
-            .HasForeignKey(x => x.AdminUserId)
-            .OnDelete(DeleteBehavior.Restrict); // admin silinsə belə jurnal qalsın
-
-        // Ən son əməliyyatları sürətli çəkmək üçün
         builder.HasIndex(x => x.CreatedAt);
     }
 }

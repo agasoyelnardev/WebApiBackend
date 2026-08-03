@@ -19,13 +19,13 @@ public class GoogleBooksImportService : IBookImportService
     public async Task<List<GoogleBooksSearchResultDto>> SearchAsync(string query, CancellationToken cancellationToken)
     {
         var url = $"https://www.googleapis.com/books/v1/volumes?q={Uri.EscapeDataString(query)}&key={_apiKey}&maxResults=20";
-
+        
         var response = await _httpClient.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
-
+        
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         using var doc = JsonDocument.Parse(json);
-
+        
         var results = new List<GoogleBooksSearchResultDto>();
 
         if (!doc.RootElement.TryGetProperty("items", out var items))

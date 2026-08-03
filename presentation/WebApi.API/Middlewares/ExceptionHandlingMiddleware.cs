@@ -31,7 +31,7 @@ public class ExceptionHandlingMiddleware
                 NotFoundException => (HttpStatusCode.NotFound, ex.Message),
                 BadRequestException => (HttpStatusCode.BadRequest, ex.Message),
                 ConflictException => (HttpStatusCode.Conflict, ex.Message),
-                _ => (HttpStatusCode.InternalServerError, "Daxili server xətası baş verdi.")
+                _ => (HttpStatusCode.InternalServerError, ex.Message)
             };
 
             context.Response.ContentType = "application/json";

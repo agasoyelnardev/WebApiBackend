@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.Rooms.Commands;
+using WebApi.Application.Features.Rooms.Commands.InviteToRoom;
 using WebApi.Application.Features.Rooms.Queries;
 using WebApi.Application.Interfaces;
 
@@ -63,5 +64,19 @@ public class RoomsController : ControllerBase
         });
 
         return Ok(new { Message = "Host statusu ötürüldü" });
+    }
+    
+    [Authorize]
+    [HttpPost("{roomId}/invite/{recipientUserId}")]
+    public async Task<IActionResult> InviteToRoom(Guid roomId, string recipientUserId)
+    {
+        await _mediator.Send(new InviteToRoomCommand
+        {
+            RoomId = roomId,
+            RecipientUserId = recipientUserId,
+            SenderUserId = _currentUserService.UserId
+        });
+
+        return Ok(new { Message = "Dəvət göndərildi" });
     }
 }

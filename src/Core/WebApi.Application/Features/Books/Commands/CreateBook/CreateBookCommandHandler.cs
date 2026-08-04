@@ -8,12 +8,15 @@ namespace WebApi.Application.Features.Books.Commands.CreateBook;
 public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Guid>
 {
     private static readonly string[] AllowedLanguages = { "az", "en" };
+    private const long MaxFileSizeBytes = 50 * 1024 * 1024; // 50MB
 
     private readonly IAppDbContext _context;
+    private readonly IFileStorageService _fileStorageService;
 
-    public CreateBookCommandHandler(IAppDbContext context)
+    public CreateBookCommandHandler(IAppDbContext context, IFileStorageService fileStorageService)
     {
         _context = context;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<Guid> Handle(CreateBookCommand request, CancellationToken cancellationToken)
@@ -33,10 +36,18 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Guid>
         if (!AllowedLanguages.Contains(request.Language))
             throw new BadRequestException("Dil yalnız 'az' və ya 'en' ola bilər.");
 
+        // PDF faylı yüklənibsə, onu diskə saxla və PdfUrl-i avtomatik təyin et
+        var pdfUrl = request.PdfUrl;
+
+        if (request.PdfFile is not null && request.PdfFile.Length > 0)
+        {
+            pdfUrl = await ValidateAndSavePdfAsync(request.PdfFile, cancellationToken);
+        }
+
         if (string.IsNullOrWhiteSpace(request.DownloadUrl)
-            && string.IsNullOrWhiteSpace(request.PdfUrl)
+            && string.IsNullOrWhiteSpace(pdfUrl)
             && string.IsNullOrWhiteSpace(request.CustomContent))
-            throw new BadRequestException("Kitabın oxunması üçün ən azı bir mənbə (DownloadUrl, PdfUrl və ya CustomContent) təqdim edilməlidir.");
+            throw new BadRequestException("Kitabın oxunması üçün ən azı bir mənbə (DownloadUrl, PdfUrl/PdfFile və ya CustomContent) təqdim edilməlidir.");
 
         var book = new Book
         {
@@ -49,7 +60,7 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Guid>
             Year = request.Year,
             Pages = request.Pages,
             DownloadUrl = request.DownloadUrl,
-            PdfUrl = request.PdfUrl,
+            PdfUrl = pdfUrl,
             CustomContent = request.CustomContent,
             IsTrending = request.IsTrending,
             IsTopRated = request.IsTopRated,
@@ -61,5 +72,31 @@ public class CreateBookCommandHandler : IRequestHandler<CreateBookCommand, Guid>
         await _context.SaveChangesAsync(cancellationToken);
 
         return book.Id;
+    }
+
+    private async Task<string> ValidateAndSavePdfAsync(Microsoft.AspNetCore.Http.IFormFile file, CancellationToken cancellationToken)
+    {
+        if (file.Length > MaxFileSizeBytes)
+            throw new BadRequestException("Fayl ölçüsü maksimum 50MB ola bilər.");
+
+        var extension = Path.GetExtension(file.FileName);
+        if (!string.Equals(extension, ".pdf", StringComparison.OrdinalIgnoreCase))
+            throw new BadRequestException("Yalnız PDF faylları qəbul olunur.");
+
+        if (!string.Equals(file.ContentType, "application/pdf", StringComparison.OrdinalIgnoreCase))
+            throw new BadRequestException("Fayl formatı düzgün deyil.");
+
+        await using var stream = file.OpenReadStream();
+
+        var buffer = new byte[4];
+        var bytesRead = await stream.ReadAsync(buffer, 0, 4, cancellationToken);
+        var header = System.Text.Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+        if (header != "%PDF")
+            throw new BadRequestException("Fayl real PDF formatında deyil.");
+
+        stream.Position = 0;
+
+        return await _fileStorageService.SavePdfAsync(stream, file.FileName, cancellationToken);
     }
 }

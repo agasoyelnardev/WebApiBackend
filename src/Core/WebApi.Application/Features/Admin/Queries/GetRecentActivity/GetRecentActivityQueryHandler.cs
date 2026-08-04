@@ -17,30 +17,55 @@ public class GetRecentActivityQueryHandler : IRequestHandler<GetRecentActivityQu
     public async Task<RecentActivityDto> Handle(GetRecentActivityQuery request, CancellationToken cancellationToken)
     {
         var recentUsers = await _context.Users
-            .OrderByDescending(u => u.Id)
-            .Take(10)
+            .OrderByDescending(u => u.CreatedAt)
+            .Take(request.UserCount)
             .Select(u => new RecentUserDto
             {
                 Id = u.Id,
                 Username = u.UserName ?? string.Empty,
+                Email = u.Email ?? string.Empty,
                 Avatar = u.Avatar,
                 CreatedAt = u.CreatedAt
             })
             .ToListAsync(cancellationToken);
 
-        var recentReviews = await _context.Reviews
+        var recentMovieReviews = await _context.Reviews
+            .Where(r => !r.IsDeleted)
             .OrderByDescending(r => r.CreatedAt)
-            .Take(10)
+            .Take(request.ReviewCount)
             .Select(r => new RecentReviewDto
             {
                 Id = r.Id,
+                Type = "Movie",
+                TargetTitle = r.Movie.Title,
                 Username = r.User.UserName ?? string.Empty,
-                MovieTitle = r.Movie.Title,
                 Rating = r.Rating,
                 Content = r.Content,
                 CreatedAt = r.CreatedAt
             })
             .ToListAsync(cancellationToken);
+
+        var recentBookReviews = await _context.BookReviews
+            .Where(r => !r.IsDeleted)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(request.ReviewCount)
+            .Select(r => new RecentReviewDto
+            {
+                Id = r.Id,
+                Type = "Book",
+                TargetTitle = r.Book.Title,
+                Username = r.User.UserName ?? string.Empty,
+                Rating = r.Rating,
+                Content = r.Comment,
+                CreatedAt = r.CreatedAt
+            })
+            .ToListAsync(cancellationToken);
+
+        var recentReviews = recentMovieReviews
+            .Concat(recentBookReviews)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(request.ReviewCount)
+            .ToList();
 
         return new RecentActivityDto
         {

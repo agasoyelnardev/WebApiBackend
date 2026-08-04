@@ -26,6 +26,7 @@ builder.Services.AddHttpClient<IMovieImportService, TmdbMovieImportService>();
 builder.Services.AddHttpClient<IBookImportService, GoogleBooksImportService>();
 builder.Services.AddHttpClient<IAiChatService, GeminiChatService>();
 builder.Services.AddSingleton<IOnlineUsersTracker, OnlineUsersTracker>();
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 
 builder.Services.AddHttpClient();
@@ -39,6 +40,11 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowCredentials();
     });
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50MB
 });
 
 builder.Services.AddRateLimiter(options =>
@@ -195,6 +201,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseRouting();

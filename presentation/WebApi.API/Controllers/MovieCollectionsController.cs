@@ -8,6 +8,7 @@ using WebApi.Application.Features.MovieCollections.Commands.RemoveMovieFromColle
 using WebApi.Application.Features.MovieCollections.Commands.ToggleMovieCollectionLike;
 using WebApi.Application.Features.MovieCollections.Commands.ToggleSaveCollection;
 using WebApi.Application.Features.MovieCollections.Commands.UpdateMovieCollection;
+using WebApi.Application.Features.MovieCollections.Queries.GetAllMovieCollections;
 using WebApi.Application.Features.MovieCollections.Queries.GetMovieCollectionById;
 using WebApi.Application.Features.MovieCollections.Queries.GetSavedMovieCollections;
 using WebApi.Application.Features.MovieCollections.Queries.GetUserMovieCollections;
@@ -130,5 +131,18 @@ public class MovieCollectionsController : ControllerBase
         });
 
         return Ok(new { IsLiked = isLiked });
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var query = new GetAllMovieCollectionsQuery
+        {
+            Page = page,
+            PageSize = pageSize
+        };
+
+        var collections = await _mediator.Send(query);
+        return Ok(collections);
     }
 }

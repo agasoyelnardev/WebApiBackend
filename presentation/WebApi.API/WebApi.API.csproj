@@ -26,4 +26,8 @@
       <ProjectReference Include="..\..\src\Core\WebApi.Application\WebApi.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
 </Project>

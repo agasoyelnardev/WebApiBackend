@@ -5,6 +5,7 @@ using WebApi.Application.Features.Books.Commands.CreateBook;
 using WebApi.Application.Features.Books.Commands.DeleteBook;
 using WebApi.Application.Features.Books.Commands.ImportBookFromGoogleBooks;
 using WebApi.Application.Features.Books.Commands.UpdateBook;
+using WebApi.Application.Features.Books.Commands.UploadPdf;
 using WebApi.Application.Features.Books.Queries.GetBookById;
 using WebApi.Application.Features.Books.Queries.GetFilteredBooks;
 using WebApi.Application.Features.Books.Queries.SearchGoogleBooks;
@@ -45,7 +46,8 @@ public class BooksController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Create(CreateBookCommand command)
+    [RequestSizeLimit(50 * 1024 * 1024)] // 50MB
+    public async Task<IActionResult> Create([FromForm] CreateBookCommand command)
     {
         var bookId = await _mediator.Send(command);
         return Ok(bookId);
@@ -53,7 +55,8 @@ public class BooksController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(Guid id, UpdateBookCommand command)
+    [RequestSizeLimit(50 * 1024 * 1024)] // 50MB
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateBookCommand command)
     {
         command.Id = id;
         await _mediator.Send(command);
@@ -82,5 +85,13 @@ public class BooksController : ControllerBase
     {
         var bookId = await _mediator.Send(new ImportBookFromGoogleBooksCommand { GoogleBooksId = googleBooksId });
         return Ok(bookId);
+    }
+    [Authorize(Roles = "Admin")]
+    [HttpPost("upload-pdf")]
+    [RequestSizeLimit(50 * 1024 * 1024)] // 50MB
+    public async Task<IActionResult> UploadPdf(IFormFile file)
+    {
+        var pdfUrl = await _mediator.Send(new UploadPdfCommand { File = file });
+        return Ok(new { PdfUrl = pdfUrl });
     }
 }

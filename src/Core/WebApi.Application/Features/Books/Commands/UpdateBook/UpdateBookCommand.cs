@@ -1,4 +1,6 @@
+// WebApi.Application/Features/Books/Commands/UpdateBook/UpdateBookCommand.cs
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApi.Application.Features.Books.Commands.UpdateBook;
 
@@ -13,10 +15,11 @@ public class UpdateBookCommand : IRequest<bool>
     public int Year { get; set; }
     public int Pages { get; set; }
     public string? DownloadUrl { get; set; }
-    public string? PdfUrl { get; set; }
+    public string? PdfUrl { get; set; } 
+    public IFormFile? PdfFile { get; set; } 
     public string? CustomContent { get; set; }
     public bool IsTrending { get; set; }
     public bool IsTopRated { get; set; }
     public bool IsNewRelease { get; set; }
-    public List<string> Genres { get; set; } = new(); 
+    public List<string> Genres { get; set; } = new();
 }

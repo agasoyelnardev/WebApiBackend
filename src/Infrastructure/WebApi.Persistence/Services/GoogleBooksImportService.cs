@@ -18,10 +18,34 @@ public class GoogleBooksImportService : IBookImportService
 
     public async Task<List<GoogleBooksSearchResultDto>> SearchAsync(string query, CancellationToken cancellationToken)
     {
-        var url = $"https://www.googleapis.com/books/v1/volumes?q={Uri.EscapeDataString(query)}&key={_apiKey}&maxResults=20";
-        
-        var response = await _httpClient.GetAsync(url, cancellationToken);
-        response.EnsureSuccessStatusCode();
+        var url = $"https://www.googleapis.com/books/v1/volumes?q={Uri.EscapeDataString(query.Trim())}&key={_apiKey}&maxResults=20";        
+        HttpResponseMessage? response = null;
+        const int maxRetries = 3;
+
+        for (var attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            response = await _httpClient.GetAsync(url, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+                break;
+
+            // Yalnız müvəqqəti xətalarda (503, 429) yenidən cəhd et
+            if (response.StatusCode is System.Net.HttpStatusCode.ServiceUnavailable
+                    or (System.Net.HttpStatusCode)429 && attempt < maxRetries)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken); // 1s, 2s gözlə
+                continue;
+            }
+
+            break;
+        }
+
+        if (response is null || !response.IsSuccessStatusCode)
+        {
+            var errorBody = response is not null ? await response.Content.ReadAsStringAsync(cancellationToken) : "Cavab alınmadı";
+            throw new InvalidOperationException(
+                $"Google Books API xəta qaytardı ({(response is not null ? (int)response.StatusCode : 0)}): {errorBody}");
+        }
         
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         using var doc = JsonDocument.Parse(json);
@@ -63,9 +87,38 @@ public class GoogleBooksImportService : IBookImportService
     {
         var url = $"https://www.googleapis.com/books/v1/volumes/{googleBooksId}?key={_apiKey}";
 
-        var response = await _httpClient.GetAsync(url, cancellationToken);
-        if (!response.IsSuccessStatusCode)
+        HttpResponseMessage? response = null;
+        const int maxRetries = 3;
+
+        for (var attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            response = await _httpClient.GetAsync(url, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+                break;
+
+            if (response.StatusCode is System.Net.HttpStatusCode.ServiceUnavailable
+                    or (System.Net.HttpStatusCode)429 && attempt < maxRetries)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken);
+                continue;
+            }
+
+            break;
+        }
+
+        if (response is null)
             return null;
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            return null;
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            throw new InvalidOperationException(
+                $"Google Books API xəta qaytardı ({(int)response.StatusCode}): {errorBody}");
+        }
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         using var doc = JsonDocument.Parse(json);
@@ -100,6 +153,16 @@ public class GoogleBooksImportService : IBookImportService
 
         string? previewLink = volumeInfo.TryGetProperty("previewLink", out var pl) ? pl.GetString() : null;
 
+        List<string> genres = new();
+        if (volumeInfo.TryGetProperty("categories", out var categoriesArr))
+        {
+            genres = categoriesArr.EnumerateArray()
+                .Select(c => c.GetString())
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c!)
+                .ToList();
+        }
+        
         return new GoogleBooksDetailDto
         {
             GoogleBooksId = googleBooksId,
@@ -109,7 +172,8 @@ public class GoogleBooksImportService : IBookImportService
             Cover = cover,
             Year = year,
             Pages = pages,
-            PreviewLink = previewLink
+            PreviewLink = previewLink,
+            Genres = genres
         };
     }
 }

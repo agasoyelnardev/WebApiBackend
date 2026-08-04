@@ -18,6 +18,7 @@ public class GoogleBooksDetailDto
     public int Year { get; set; }
     public int Pages { get; set; }
     public string? PreviewLink { get; set; }
+    public List<string> Genres { get; set; } = new();
 }
 
 public interface IBookImportService

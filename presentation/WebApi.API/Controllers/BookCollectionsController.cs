@@ -8,6 +8,7 @@ using WebApi.Application.Features.BookCollections.Commands.RemoveBookFromCollect
 using WebApi.Application.Features.BookCollections.Commands.ToggleCollectionLike;
 using WebApi.Application.Features.BookCollections.Commands.ToggleSaveCollection;
 using WebApi.Application.Features.BookCollections.Commands.UpdateBookCollection;
+using WebApi.Application.Features.BookCollections.Queries.GetAllBookCollections;
 using WebApi.Application.Features.BookCollections.Queries.GetBookCollectionById;
 using WebApi.Application.Features.BookCollections.Queries.GetSavedBookCollections;
 using WebApi.Application.Features.BookCollections.Queries.GetUserCollections;
@@ -53,6 +54,19 @@ public class BookCollectionsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var query = new GetAllBookCollectionsQuery
+        {
+            Page = page,
+            PageSize = pageSize
+        };
+
+        var collections = await _mediator.Send(query, HttpContext.RequestAborted);
+        return Ok(collections);
+    }
+    
     [Authorize]
     [HttpPost("{id}/books/{bookId}")]
     public async Task<IActionResult> AddBook(Guid id, Guid bookId)

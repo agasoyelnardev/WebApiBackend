@@ -26,6 +26,9 @@ public class ImportBookFromGoogleBooksCommandHandler : IRequestHandler<ImportBoo
         if (string.IsNullOrWhiteSpace(details.Title))
             throw new BadRequestException("Kitabın başlığı tapılmadı, idxal edilə bilmədi.");
 
+        if (string.IsNullOrWhiteSpace(details.PreviewLink))
+            throw new BadRequestException("Bu kitab üçün Google Books-dan oxuma linki tapılmadı. Zəhmət olmasa idxaldan sonra PdfUrl/CustomContent əl ilə əlavə edin, ya da bu kitabı idxal etməyin.");
+
         var book = new Book
         {
             Title = details.Title,
@@ -33,12 +36,13 @@ public class ImportBookFromGoogleBooksCommandHandler : IRequestHandler<ImportBoo
             Description = details.Description,
             Cover = details.Cover,
             Rating = 0,
-            Language = "en", // Google Books əsasən ingilis dilli nəticələr verir, admin sonra dəyişə bilər
+            Language = "en",
             Year = details.Year == 0 ? DateTime.UtcNow.Year : details.Year,
-            Pages = details.Pages == 0 ? 1 : details.Pages, // 0 səhifə mənasız olduğu üçün minimal dəyər
-            DownloadUrl = details.PreviewLink, // ola bilər null qalsın, admin sonra doldurar
+            Pages = details.Pages == 0 ? 1 : details.Pages,
+            DownloadUrl = details.PreviewLink,
             PdfUrl = null,
-            CustomContent = null
+            CustomContent = null,
+            Genres = details.Genres 
         };
 
         await _context.Books.AddAsync(book, cancellationToken);

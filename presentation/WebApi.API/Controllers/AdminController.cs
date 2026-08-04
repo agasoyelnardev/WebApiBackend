@@ -13,6 +13,7 @@ using WebApi.Application.Features.Admin.Dtos;
 using WebApi.Application.Features.Admin.Queries.GetAdminActivityLogs;
 using WebApi.Application.Features.Admin.Queries.GetAdminStats;
 using WebApi.Application.Features.Admin.Queries.GetAdminUsers;
+using WebApi.Application.Features.Admin.Queries.GetRecentActivity;
 
 namespace WebApi.API.Controllers;
 
@@ -106,5 +107,20 @@ public class AdminController : ControllerBase
     {
         await _mediator.Send(new CloseStreamRoomCommand { RoomId = id }, cancellationToken);
         return NoContent();
+    }
+    
+    [HttpGet("recent-activity")]
+    public async Task<ActionResult<RecentActivityDto>> GetRecentActivity(
+        [FromQuery] int userCount = 10,
+        [FromQuery] int reviewCount = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var query = new GetRecentActivityQuery
+        {
+            UserCount = userCount,
+            ReviewCount = reviewCount
+        };
+
+        return Ok(await _mediator.Send(query, cancellationToken));
     }
 }

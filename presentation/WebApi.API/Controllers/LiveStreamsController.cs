@@ -2,7 +2,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Application.Features.LiveStreams.Commands.CreateLiveStream;
+using WebApi.Application.Features.LiveStreams.Commands.DeleteLiveStream;
+using WebApi.Application.Features.LiveStreams.Commands.SendLiveStreamMessage;
 using WebApi.Application.Features.LiveStreams.Commands.ToggleLiveStream;
+using WebApi.Application.Features.LiveStreams.Commands.UpdateLiveStream;
 using WebApi.Application.Features.LiveStreams.Queries.GetActiveLiveStreams;
 using WebApi.Application.Features.LiveStreams.Queries.GetLiveStreamById;
 using WebApi.Application.Features.LiveStreams.Queries.GetLiveStreamChatHistory;
@@ -67,5 +70,30 @@ public class LiveStreamsController : ControllerBase
     {
         var id = await _mediator.Send(command, cancellationToken);
         return Ok(new { Id = id });
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPut("admin/{id}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateLiveStreamCommand command, CancellationToken cancellationToken)
+    {
+        command.Id = id;
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("admin/{id}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new DeleteLiveStreamCommand(id), cancellationToken);
+        return NoContent();
+    }
+    
+    [Authorize]
+    [HttpPost("chat-message")]
+    public async Task<IActionResult> SendMessage([FromBody] SendLiveStreamMessageCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command, cancellationToken);
+        return Ok(result);
     }
 }

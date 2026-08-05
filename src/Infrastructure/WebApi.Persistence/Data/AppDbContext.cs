@@ -48,6 +48,9 @@ namespace WebApi.Persistence.Data;
         public DbSet<BookCollectionLike> BookCollectionLikes { get; set; }
         public DbSet<SavedBookCollection> SavedBookCollections { get; set; }
         public DbSet<AdminActivityLog> AdminActivityLogs { get; set; }
+        public DbSet<LiveStream> LiveStreams { get; }
+        public DbSet<LiveStreamMessage> LiveStreamMessages { get; }
+        public DbSet<LiveStreamSchedule> LiveStreamSchedules { get; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

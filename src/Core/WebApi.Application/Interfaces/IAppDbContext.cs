@@ -40,4 +40,7 @@ public interface IAppDbContext
     DbSet<BookCollectionLike> BookCollectionLikes { get; }
     DbSet<SavedBookCollection> SavedBookCollections { get; }
     DbSet<AdminActivityLog> AdminActivityLogs { get; }
+    DbSet<LiveStream> LiveStreams { get; }
+    DbSet<LiveStreamMessage> LiveStreamMessages { get; }
+    DbSet<LiveStreamSchedule> LiveStreamSchedules { get; }
 }

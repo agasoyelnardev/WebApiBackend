@@ -27,7 +27,7 @@ builder.Services.AddHttpClient<IBookImportService, GoogleBooksImportService>();
 builder.Services.AddHttpClient<IAiChatService, GeminiChatService>();
 builder.Services.AddSingleton<IOnlineUsersTracker, OnlineUsersTracker>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
-
+builder.Services.AddSingleton<ILiveStreamPresenceService, LiveStreamPresenceService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddControllers();
@@ -76,7 +76,6 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "JWT token daxil edin"
     });
-
     
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
@@ -84,7 +83,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -130,7 +128,7 @@ builder.Services.AddAuthentication(options =>
                 var path = context.HttpContext.Request.Path;
 
                 if (!string.IsNullOrEmpty(accessToken) &&
-                    (path.StartsWithSegments("/chathub") || path.StartsWithSegments("/notificationhub")))
+                    (path.StartsWithSegments("/chathub") || path.StartsWithSegments("/notificationhub") || path.StartsWithSegments("/livestreamhub")))
                 {
                     context.Token = accessToken;
                 }
@@ -214,6 +212,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapHub<WebApi.Application.Hubs.LiveStreamHub>("/livestreamhub").RequireAuthorization();
 app.MapHub<WebApi.Application.Hubs.ChatHub>("/chathub").RequireAuthorization();
 app.MapHub<WebApi.Application.Hubs.NotificationHub>("/notificationhub").RequireAuthorization();
 app.Run();

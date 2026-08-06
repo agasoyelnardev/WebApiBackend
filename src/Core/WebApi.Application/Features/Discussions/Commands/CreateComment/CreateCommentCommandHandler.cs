@@ -40,7 +40,7 @@ public class CreateCommentCommandHandler : IRequestHandler<CreateCommentCommand,
         {
             DiscussionId = request.DiscussionId,
             Content = request.Content,
-            AuthorId = currentUserId   // ← dəyişdi
+            AuthorId = currentUserId   
         };
 
         await _context.Comments.AddAsync(comment, cancellationToken);

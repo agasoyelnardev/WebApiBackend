@@ -6,6 +6,7 @@ using WebApi.Application.Features.Discussions.Commands.CreateDiscussion;
 using WebApi.Application.Features.Discussions.Commands.DeleteComment;
 using WebApi.Application.Features.Discussions.Commands.DeleteDiscussion;
 using WebApi.Application.Features.Discussions.Commands.ToggleDiscussionLike;
+using WebApi.Application.Features.Discussions.Commands.UpdateComment;
 using WebApi.Application.Features.Discussions.Commands.UpdateDiscussion;
 using WebApi.Application.Features.Discussions.Queries.GetDiscussionById;
 using WebApi.Application.Features.Discussions.Queries.GetDiscussions;
@@ -117,6 +118,15 @@ public class DiscussionsController : ControllerBase
             Id = commentId,
         });
 
+        return NoContent();
+    }
+    
+    [Authorize]
+    [HttpPut("comments/{id}")]
+    public async Task<IActionResult> UpdateComment(Guid id, [FromBody] UpdateCommentCommand command, CancellationToken cancellationToken)
+    {
+        command.Id = id;
+        await _mediator.Send(command, cancellationToken);
         return NoContent();
     }
 }

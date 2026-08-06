@@ -24,8 +24,6 @@ public class ReviewsController : ControllerBase
         _currentUserService = currentUserService;
     }
 
-
-
     [HttpGet("movie/{movieId}")]
     public async Task<IActionResult> GetByMovieId(Guid movieId)
     {

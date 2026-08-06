@@ -12,7 +12,7 @@ public interface IChatRepository
     Task AddRoomAsync(StreamRoom room, CancellationToken cancellationToken = default);
     Task<StreamRoom?> GetRoomByIdAsync(Guid roomId, CancellationToken cancellationToken = default);
     Task<bool> SaveChangesAsync(CancellationToken cancellationToken = default);
-
+    Task<ChatMessage?> GetMessageByIdAsync(Guid messageId, CancellationToken cancellationToken = default);
     Task IncrementViewerCountAsync(Guid roomId, CancellationToken cancellationToken = default);
     Task DecrementViewerCountAsync(Guid roomId, CancellationToken cancellationToken = default);
 }

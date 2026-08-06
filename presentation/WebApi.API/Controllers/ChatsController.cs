@@ -48,5 +48,14 @@ public class ChatsController : ControllerBase
         await _mediator.Send(new DeleteChatMessageCommand(id));
         return NoContent();
     }
+    
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateMessage(Guid id, [FromBody] UpdateChatMessageCommand command, CancellationToken cancellationToken)
+    {
+        command.Id = id;
+        await _mediator.Send(command, cancellationToken);
+        return NoContent();
+    }
 
 }

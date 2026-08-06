@@ -110,4 +110,11 @@ public class ChatRepository : IChatRepository
     {
         return await _context.SaveChangesAsync(cancellationToken) > 0;
     }
+    public async Task<ChatMessage?> GetMessageByIdAsync(
+        Guid messageId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.ChatMessages
+            .FirstOrDefaultAsync(m => m.Id == messageId, cancellationToken);
+    }
 }

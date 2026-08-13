@@ -1,0 +1,148 @@
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WebApi.Application.Features.MovieCollections.Commands.AddMovieToCollection;
+using WebApi.Application.Features.MovieCollections.Commands.CreateMovieCollection;
+using WebApi.Application.Features.MovieCollections.Commands.DeleteMovieCollection;
+using WebApi.Application.Features.MovieCollections.Commands.RemoveMovieFromCollection;
+using WebApi.Application.Features.MovieCollections.Commands.ToggleMovieCollectionLike;
+using WebApi.Application.Features.MovieCollections.Commands.ToggleSaveCollection;
+using WebApi.Application.Features.MovieCollections.Commands.UpdateMovieCollection;
+using WebApi.Application.Features.MovieCollections.Queries.GetAllMovieCollections;
+using WebApi.Application.Features.MovieCollections.Queries.GetMovieCollectionById;
+using WebApi.Application.Features.MovieCollections.Queries.GetSavedMovieCollections;
+using WebApi.Application.Features.MovieCollections.Queries.GetUserMovieCollections;
+using WebApi.Application.Interfaces;
+
+namespace WebApi.API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class MovieCollectionsController : ControllerBase
+{
+    private readonly IMediator _mediator;
+    private readonly ICurrentUserService _currentUserService;
+
+    public MovieCollectionsController(IMediator mediator, ICurrentUserService currentUserService)
+    {
+        _mediator = mediator;
+        _currentUserService = currentUserService;
+    }
+ 
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateMovieCollectionCommand command)
+    {
+        var id = await _mediator.Send(command);
+        return Ok(id);
+    }
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, UpdateMovieCollectionCommand command)
+    {
+        command.Id = id;
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _mediator.Send(new DeleteMovieCollectionCommand(id));
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("{id}/movies/{movieId}")]
+    public async Task<IActionResult> AddMovie(Guid id, Guid movieId)
+    {
+        await _mediator.Send(new AddMovieToCollectionCommand
+        {
+            MovieCollectionId = id,
+            MovieId = movieId
+        });
+
+        return Ok(new { Message = "Film kolleksiyaya əlavə edildi" });
+    }
+
+    [Authorize]
+    [HttpDelete("{id}/movies/{movieId}")]
+    public async Task<IActionResult> RemoveMovie(Guid id, Guid movieId)
+    {
+        await _mediator.Send(new RemoveMovieFromCollectionCommand
+        {
+            MovieCollectionId = id,
+            MovieId = movieId
+        });
+
+        return Ok(new { Message = "Film kolleksiyadan çıxarıldı" });
+    }
+
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetByUser(string userId)
+    {
+        var collections = await _mediator.Send(
+            new GetUserMovieCollectionsQuery(userId, _currentUserService.UserId));
+
+        return Ok(collections);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var collection = await _mediator.Send(
+            new GetMovieCollectionByIdQuery(id, _currentUserService.UserId));
+
+        if (collection is null)
+            return NotFound();
+
+        return Ok(collection);
+    }
+
+    [Authorize]
+    [HttpPost("{id}/save")]
+    public async Task<IActionResult> ToggleSave(Guid id)
+    {
+        var isSaved = await _mediator.Send(new ToggleSaveCollectionCommand
+        {
+            MovieCollectionId = id
+        });
+
+        return Ok(new { IsSaved = isSaved });
+    }
+
+    [Authorize]
+    [HttpGet("saved")]
+    public async Task<IActionResult> GetSaved()
+    {
+        var collections = await _mediator.Send(new GetSavedMovieCollectionsQuery());
+        return Ok(collections);
+    }
+
+    [Authorize]
+    [HttpPost("{id}/like")]
+    public async Task<IActionResult> ToggleLike(Guid id)
+    {
+        var isLiked = await _mediator.Send(new ToggleMovieCollectionLikeCommand
+        {
+            MovieCollectionId = id
+        });
+
+        return Ok(new { IsLiked = isLiked });
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var query = new GetAllMovieCollectionsQuery
+        {
+            Page = page,
+            PageSize = pageSize
+        };
+
+        var collections = await _mediator.Send(query);
+        return Ok(collections);
+    }
+}
